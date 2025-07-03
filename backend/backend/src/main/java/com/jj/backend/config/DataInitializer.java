@@ -53,7 +53,9 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         List<Role> allRoles = roleRepository.findAll();
-        List<Role> userRole = Collections.singletonList(new Role(USER));
+        Role userRole = roleRepository.findByRoleName(USER)
+                .orElseThrow(() -> new RuntimeException("USER role not found"));
+        List<Role> userRoles = Collections.singletonList(userRole);
 
         if (!userEntityRepository.existsByEmail(adminEmail)) {
             UserEntity admin = UserEntity.builder()
@@ -72,7 +74,7 @@ public class DataInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode(userPassword))
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
-                    .roles(userRole)
+                    .roles(userRoles)
                     .name("John")
                     .surname("Doe")
                     .phoneNumber("123456789")
