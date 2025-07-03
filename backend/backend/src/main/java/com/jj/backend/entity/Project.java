@@ -22,19 +22,19 @@ public class Project {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "company_name")
+    @Column(name = "company_name", nullable = false)
     private String companyName;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     private String description;
 
-    @Column(name = "start_date")
+    @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
 
-    @Column(name = "end_date")
+    @Column(name = "end_date", nullable = false )
     private LocalDateTime endDate;
 
     @Column(name = "created_at", nullable = false)
