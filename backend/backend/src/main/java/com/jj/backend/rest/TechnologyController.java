@@ -81,7 +81,7 @@ public class TechnologyController {
         try {
             Technology technology = technologyService.buildTechnology(dto);
             Technology createdTech = technologyService.saveTechnology(technology);
-            TechnologyResponseDto technologyResponseDto = technologyService.toDto(createdTech);
+            TechnologyResponseDto technologyResponseDto = technologyService.toTechnologyDto(createdTech);
             return ResponseEntity.ok(technologyResponseDto);
         } catch (IllegalArgumentException e) {
             // Handle duplicate name or invalid input
@@ -105,7 +105,7 @@ public class TechnologyController {
     public ResponseEntity<?> updateTechnology(@PathVariable int id, @RequestBody TechnologyRequestDto dto) {
         try {
             Technology updatedTech = technologyService.updateTechnology(id, dto);
-            TechnologyResponseDto technologyResponseDto = technologyService.toDto(updatedTech);
+            TechnologyResponseDto technologyResponseDto = technologyService.toTechnologyDto(updatedTech);
             return ResponseEntity.ok(technologyResponseDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

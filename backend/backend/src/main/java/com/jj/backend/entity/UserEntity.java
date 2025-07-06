@@ -1,6 +1,7 @@
 package com.jj.backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -23,6 +24,7 @@ public class UserEntity {
     @Column(name = "id")
     private int id;
 
+    @Email
     @Column(name = "email", unique = true, nullable = false)
     private String email;
 

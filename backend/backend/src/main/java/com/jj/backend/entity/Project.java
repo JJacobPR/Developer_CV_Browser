@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 @Table(name = "projects")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -47,6 +49,7 @@ public class Project {
     @JoinTable(name = "projects_technologies", joinColumns = @JoinColumn(name = "project_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "technology_id", referencedColumnName = "id"))
     private List<Technology> technologies = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "project")
-    Set<UserProject> users;
+    private Set<UserProject> users = new HashSet<>();
 }

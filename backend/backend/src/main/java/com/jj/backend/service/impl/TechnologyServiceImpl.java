@@ -10,6 +10,7 @@ import com.jj.backend.repository.TechnologyRepository;
 import com.jj.backend.repository.UserProjectRepository;
 import com.jj.backend.service.service.ProjectService;
 import com.jj.backend.service.service.TechnologyService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,11 +22,12 @@ import java.util.stream.Collectors;
 public class TechnologyServiceImpl implements TechnologyService {
 
     private final TechnologyRepository technologyRepository;
+    @Lazy
     private final ProjectService projectService;
     private final UserProjectRepository userProjectRepository;
     private final StandardUserRepository standardUserRepository;
 
-    public TechnologyServiceImpl(TechnologyRepository technologyRepository, ProjectService projectService, UserProjectRepository userProjectRepository, StandardUserRepository standardUserRepository) {
+    public TechnologyServiceImpl(TechnologyRepository technologyRepository,@Lazy ProjectService projectService, UserProjectRepository userProjectRepository, StandardUserRepository standardUserRepository) {
         this.technologyRepository = technologyRepository;
         this.projectService = projectService;
         this.userProjectRepository = userProjectRepository;
@@ -37,10 +39,6 @@ public class TechnologyServiceImpl implements TechnologyService {
         return technologyRepository.findAll();
     }
 
-    @Override
-    public List<Technology> getTechnologiesByType(TechnologyType technologyType) {
-        return technologyRepository.findAllByType(technologyType);
-    }
 
     @Override
     public List<Technology> getTechnologiesByUser(Integer userId) {
@@ -51,10 +49,6 @@ public class TechnologyServiceImpl implements TechnologyService {
         return userProjectRepository.findTechnologiesByUserId(userId);
     }
 
-    @Override
-    public Technology getTechnology(Integer id) {
-        return technologyRepository.findTechnologyById(id);
-    }
 
     @Override
     public Technology saveTechnology(Technology technology) {
@@ -123,7 +117,7 @@ public class TechnologyServiceImpl implements TechnologyService {
     }
 
     @Override
-    public TechnologyResponseDto toDto(Technology technology) {
+    public TechnologyResponseDto toTechnologyDto(Technology technology) {
         if (technology == null) {
             return null;
         }
@@ -134,6 +128,11 @@ public class TechnologyServiceImpl implements TechnologyService {
                 technology.getCreatedAt(),
                 technology.getUpdatedAt()
         );
+    }
+
+    @Override
+    public List<Technology> findAllById(List<Integer> technologies) {
+        return technologyRepository.findAllById(technologies);
     }
 
 }

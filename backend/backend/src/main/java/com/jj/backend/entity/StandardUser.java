@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -31,6 +32,7 @@ public class StandardUser extends UserEntity {
     @Column(name = "bio", columnDefinition = "TEXT", nullable = false)
     private String bio;
 
+    @Builder.Default
     @OneToMany(mappedBy = "standardUser")
-    Set<UserProject> projects;
+    Set<UserProject> projects = new HashSet<>();
 }

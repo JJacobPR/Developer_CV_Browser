@@ -9,15 +9,12 @@ import java.util.List;
 
 public interface TechnologyService {
     List<Technology> getTechnologies();
-    List<Technology> getTechnologiesByType(TechnologyType technologyType);
     List<Technology> getTechnologiesByUser(Integer userId);
-    Technology getTechnology(Integer id);
     Technology saveTechnology(Technology technology);
     Technology buildTechnology(TechnologyRequestDto technologyRequestDto);
     Technology updateTechnology(Integer technologyId, TechnologyRequestDto dto);
     void deleteTechnology(Integer id);
-
     List<TechnologyResponseDto> toDtoList(List<Technology> technologies);
-
-    TechnologyResponseDto toDto(Technology technology);
+    TechnologyResponseDto toTechnologyDto(Technology technology);
+    List<Technology> findAllById(List<Integer> technologies);
 }

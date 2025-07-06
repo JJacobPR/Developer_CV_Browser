@@ -1,10 +1,7 @@
 package com.jj.backend.service.impl;
 
 import com.jj.backend.config.RoleName;
-import com.jj.backend.dto.LoginResponseDto;
-import com.jj.backend.dto.StandardUserCreateRequestDto;
-import com.jj.backend.dto.StandardUserCreateResponseDto;
-import com.jj.backend.dto.StandardUserLoginResponseDto;
+import com.jj.backend.dto.*;
 import com.jj.backend.entity.Role;
 import com.jj.backend.entity.StandardUser;
 import com.jj.backend.entity.UserEntity;
@@ -31,7 +28,6 @@ public class UserServiceImpl implements UserService {
 
     @Value("${app.admin.email}")
     private String adminEmail;
-
 
     private final UserEntityRepository userEntityRepository;
     private final StandardUserRepository standardUserRepository;
@@ -62,11 +58,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<UserEntity> getUserById(Integer id) {
-        return userEntityRepository.findById(id);
-    }
-
-    @Override
     public Optional<UserEntity> getUserByEmail(String email) {
         return userEntityRepository.findUserEntityByEmail(email);
     }
@@ -77,7 +68,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity createStandardUser(StandardUserCreateRequestDto dto) {
+    public UserEntity createStandardUser(StandardUserRequestDto dto) {
         if (userEntityRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("User with email " + dto.getEmail() + " already exists.");
         }
@@ -103,7 +94,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity updateStandardUser(StandardUserCreateRequestDto dto, Integer userId) {
+    public UserEntity updateStandardUser(StandardUserRequestDto dto, Integer userId) {
         StandardUser existingUser = standardUserRepository.findStandardUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found"));
 
@@ -155,7 +146,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public StandardUserCreateResponseDto toStandardUserCreateResponseDto(UserEntity user) {
+    public StandardUserCreateResponseDto toStandardUserResponseDto(UserEntity user) {
         StandardUser standardUser = standardUserRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -175,6 +166,16 @@ public class UserServiceImpl implements UserService {
         dto.setRole(RoleName.USER.toString());
 
         return dto;
+    }
+
+    @Override
+    public StandardUser findById(Integer userId) {
+        return standardUserRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    @Override
+    public StandardUser findByEmail(String email) {
+        return standardUserRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     private LoginResponseDto buildAdminResponse(UserEntity user, String token, List<RoleName> roles) {
