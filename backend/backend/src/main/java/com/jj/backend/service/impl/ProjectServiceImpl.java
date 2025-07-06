@@ -18,18 +18,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void getAllProjects() {
-
+    public List<Project> getAllProjects() {
+        return null;
     }
 
     @Override
-    public void createProject(Project project) {
-
-    }
-
-    @Override
-    public void updateProject(Project project) {
-
+    public Project saveProject(Project project) {
+        return null;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.jj.backend.dto;
 
+
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,11 +11,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StandardUserLoginResponseDto extends LoginResponseDto {
+public class StandardUserCreateRequestDto {
+    private String email;
+    private String password;
     private String name;
     private String surname;
-    private String workRole;
     private String phoneNumber;
+    private String workRole;
     private String bio;
-
 }

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Table(name = "technologies")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Technology {
@@ -23,9 +24,6 @@ public class Technology {
 
     @Column(name = "type", nullable = false)
     private TechnologyType type;
-
-    @Column(name = "role", nullable = false)
-    private String role;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

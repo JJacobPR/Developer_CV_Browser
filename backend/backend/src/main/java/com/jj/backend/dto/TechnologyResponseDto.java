@@ -1,5 +1,7 @@
 package com.jj.backend.dto;
 
+
+import com.jj.backend.config.TechnologyType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,12 +13,11 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponseDto {
-    private Integer id;
-    private String email;
+public class TechnologyResponseDto {
+
+    private int id;
+    private String name;
+    private TechnologyType type;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String token;
-    private String tokenType = "Bearer";
-    private String role;
 }

@@ -3,7 +3,7 @@ package com.jj.backend.security;
 
 import com.jj.backend.entity.Role;
 import com.jj.backend.entity.UserEntity;
-import com.jj.backend.service.service.UserEntityService;
+import com.jj.backend.service.service.UserService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -19,16 +19,16 @@ import java.util.stream.Collectors;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserEntityService userEntityService;
+    private final UserService userService;
 
-    public CustomUserDetailsService(UserEntityService userEntityService) {
-        this.userEntityService = userEntityService;
+    public CustomUserDetailsService(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         try {
-            UserEntity user = userEntityService.getUserByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
+            UserEntity user = userService.getUserByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
             return new User(user.getEmail(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
         }
         catch (Exception exception) {

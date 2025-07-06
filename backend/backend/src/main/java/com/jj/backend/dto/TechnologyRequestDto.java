@@ -1,5 +1,6 @@
 package com.jj.backend.dto;
 
+import com.jj.backend.config.TechnologyType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,11 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StandardUserLoginResponseDto extends LoginResponseDto {
+public class TechnologyRequestDto {
     private String name;
-    private String surname;
-    private String workRole;
-    private String phoneNumber;
-    private String bio;
-
+    private TechnologyType type;
 }

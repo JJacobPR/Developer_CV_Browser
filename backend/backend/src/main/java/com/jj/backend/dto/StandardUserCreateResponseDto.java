@@ -1,5 +1,6 @@
 package com.jj.backend.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,12 +12,15 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponseDto {
+public class StandardUserCreateResponseDto {
     private Integer id;
     private String email;
+    private String name;
+    private String surname;
+    private String phoneNumber;
+    private String workRole;
+    private String bio;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String token;
-    private String tokenType = "Bearer";
     private String role;
 }

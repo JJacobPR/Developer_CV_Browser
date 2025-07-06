@@ -10,6 +10,7 @@ import java.util.Set;
 @Table(name = "user_details")
 @PrimaryKeyJoinColumn(name = "id")
 @Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
