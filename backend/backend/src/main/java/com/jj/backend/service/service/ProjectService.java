@@ -8,14 +8,24 @@ import com.jj.backend.entity.Technology;
 import java.util.List;
 
 public interface ProjectService {
+
+    // Read
     List<ProjectResponseDto> getAllProjects();
-    Project saveProject(Project project);
+    List<ProjectResponseDto> getProjectsForUser(String email);
+    ProjectResponseDto toProjectResponseDto(Project project);
+
+    // Create / Save
     Project createProject(ProjectRequestDto projectRequestDto);
+    Project saveProject(Project project);
+
+    // Update
     Project updateProjectUser(Integer projectId, ProjectRequestDto dto, String role, String email);
     Project updateProjectAdmin(Integer projectId, ProjectRequestDto dto, String oldRole);
+
+    // Delete
     void deleteProjectUser(Integer projectId, String userEmail);
     void deleteProjectAdmin(Integer projectId);
+
+    // Utility
     void removeTechnologyFromAllProjects(Technology technology);
-    ProjectResponseDto toProjectResponseDto(Project project);
-    List<ProjectResponseDto> getProjectsForUser(String email);
 }

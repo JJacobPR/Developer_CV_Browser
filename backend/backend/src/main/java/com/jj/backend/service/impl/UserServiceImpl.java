@@ -39,7 +39,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserEntityRepository userEntityRepository;
     private final StandardUserRepository standardUserRepository;
-    private final UserProjectRepository userProjectRepository;
     @Lazy
     private final ProjectService projectService;
     private final RoleRepository roleRepository;
@@ -48,54 +47,11 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserEntityRepository userEntityRepository, StandardUserRepository standardUserRepository, UserProjectRepository userProjectRepository,@Lazy ProjectService projectService, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userEntityRepository = userEntityRepository;
         this.standardUserRepository = standardUserRepository;
-        this.userProjectRepository = userProjectRepository;
         this.projectService = projectService;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-
-    @Override
-    public PagingResult<StandardUser> findAll(PaginationRequest request) {
-        Pageable pageable = PaginationUtils.getPageable(request.getPage(), request.getSize(), request.getDirection(), request.getSortField());
-        Page<StandardUser> users = standardUserRepository.findAll(pageable);
-
-        return new PagingResult<>(
-                users.getContent(),
-                users.getTotalPages(),
-                users.getTotalElements(),
-                users.getSize(),
-                users.getNumber(),
-                users.isEmpty()
-        );
-    }
-
-
-    @Override
-    public List<StandardUserFullResponseDto> mapToFullUserDtos(List<StandardUser> users) {
-        return users.stream()
-                .map(this::toStandardUserFullDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<RoleName> getRolesByEmail(String email) {
-        List<String> roleStrings = userEntityRepository.findRolesByEmail(email);
-        // Map roles (Strings) to RoleName enum
-        return roleStrings.stream()
-                .map(RoleName::valueOf)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public Optional<UserEntity> getUserByEmail(String email) {
-        return userEntityRepository.findUserEntityByEmail(email);
-    }
-
-    @Override
-    public UserEntity saveUser(UserEntity user) {
-        return userEntityRepository.save(user);
-    }
 
     @Override
     public UserEntity createStandardUser(StandardUserRequestDto dto) {
@@ -157,22 +113,61 @@ public class UserServiceImpl implements UserService {
             throw new IllegalStateException("Cannot delete root admin");
         }
 
-        // Delete all UserProject relations
-        userProjectRepository.deleteByStandardUserId(userId);
-
         userEntityRepository.delete(user);
     }
 
-    @Override
-    public LoginResponseDto buildResponse(UserEntity user, String token) {
-        List<RoleName> roles = getRolesByEmail(user.getEmail());
-        if (roles.contains(ADMIN)) {
-            return buildAdminResponse(user, token, roles);
-        } else if (roles.contains(USER)) {
-            return buildUserResponse(user, token, roles);
-        }
 
-        throw new IllegalStateException("Unsupported role");
+    @Override
+    public UserEntity saveUser(UserEntity user) {
+        return userEntityRepository.save(user);
+    }
+
+
+    @Override
+    public Optional<UserEntity> getUserByEmail(String email) {
+        return userEntityRepository.findUserEntityByEmail(email);
+    }
+
+    @Override
+    public StandardUser findById(Integer userId) {
+        return standardUserRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    @Override
+    public StandardUser findByEmail(String email) {
+        return standardUserRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    @Override
+    public PagingResult<StandardUser> findAll(PaginationRequest request) {
+        Pageable pageable = PaginationUtils.getPageable(request.getPage(), request.getSize(), request.getDirection(), request.getSortField());
+        Page<StandardUser> users = standardUserRepository.findAll(pageable);
+
+        return new PagingResult<>(
+                users.getContent(),
+                users.getTotalPages(),
+                users.getTotalElements(),
+                users.getSize(),
+                users.getNumber(),
+                users.isEmpty()
+        );
+    }
+
+    @Override
+    public List<RoleName> getRolesByEmail(String email) {
+        List<String> roleStrings = userEntityRepository.findRolesByEmail(email);
+        // Map roles (Strings) to RoleName enum
+        return roleStrings.stream()
+                .map(RoleName::valueOf)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public List<StandardUserFullResponseDto> mapToFullUserDtos(List<StandardUser> users) {
+        return users.stream()
+                .map(this::toStandardUserFullDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -199,14 +194,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public StandardUser findById(Integer userId) {
-        return standardUserRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public LoginResponseDto buildResponse(UserEntity user, String token) {
+        List<RoleName> roles = getRolesByEmail(user.getEmail());
+        if (roles.contains(ADMIN)) {
+            return buildAdminResponse(user, token, roles);
+        } else if (roles.contains(USER)) {
+            return buildUserResponse(user, token, roles);
+        }
+
+        throw new IllegalStateException("Unsupported role");
     }
 
-    @Override
-    public StandardUser findByEmail(String email) {
-        return standardUserRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
 
     private LoginResponseDto buildAdminResponse(UserEntity user, String token, List<RoleName> roles) {
         LoginResponseDto dto = new LoginResponseDto();
@@ -258,7 +256,6 @@ public class UserServiceImpl implements UserService {
         RoleName role = roles.contains(ADMIN) ? ADMIN : roles.getFirst();
         dto.setRole(role.toString());
     }
-
 
     private boolean isRootAdmin(String email) {
         return adminEmail.equalsIgnoreCase(email);

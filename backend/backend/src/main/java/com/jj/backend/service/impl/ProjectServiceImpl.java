@@ -45,9 +45,62 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
     }
 
+    public List<ProjectResponseDto> getProjectsForUser(String email) {
+        StandardUser user = userService.findByEmail(email);
+
+        List<Project> projects = user.getProjects().stream()
+                .map(UserProject::getProject)
+                .distinct()
+                .toList();
+
+        if (projects.isEmpty()) {
+            return null;
+        }
+
+        return projects.stream()
+                .map(this::toProjectResponseDto)
+                .collect(Collectors.toList());
+    }
+
     @Override
-    public Project saveProject(Project project) {
-        return projectRepository.save(project);
+    public ProjectResponseDto toProjectResponseDto(Project project) {
+        ProjectResponseDto dto = new ProjectResponseDto();
+        dto.setProjectId(project.getId());
+        dto.setName(project.getName());
+        dto.setCompanyName(project.getCompanyName());
+        dto.setDescription(project.getDescription());
+        dto.setStartDate(project.getStartDate());
+        dto.setEndDate(project.getEndDate());
+        dto.setCreateAt(project.getCreatedAt());
+        dto.setUpdatedAt(project.getUpdatedAt());
+
+        List<StandardUserProjectResponseDto> userDtos = project.getUsers().stream()
+                .map(userProject -> {
+                    StandardUser user = userProject.getStandardUser();
+
+                    StandardUserProjectResponseDto userDto = new StandardUserProjectResponseDto();
+                    userDto.setId(user.getId());
+                    userDto.setEmail(user.getEmail());
+                    userDto.setName(user.getName());
+                    userDto.setSurname(user.getSurname());
+                    userDto.setPhoneNumber(user.getPhoneNumber());
+                    userDto.setWorkRole(user.getWorkRole());
+                    userDto.setBio(user.getBio());
+                    userDto.setProjectRole(userProject.getProjectRole());
+
+                    return userDto;
+                })
+                .collect(Collectors.toList());
+
+        dto.setUsers(userDtos);
+
+        // Map technologies
+        List<TechnologyResponseDto> techDtos = project.getTechnologies().stream()
+                .map(technologyService::toTechnologyDto)
+                .collect(Collectors.toList());
+        dto.setTechnologies(techDtos);
+
+        return dto;
     }
 
     @Override
@@ -97,6 +150,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public Project saveProject(Project project) {
+        return projectRepository.save(project);
+    }
+
+    @Override
     public Project updateProjectUser(Integer projectId, ProjectRequestDto dto, String oldRole, String userEmail) {
         StandardUser user = standardUserRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -104,60 +162,13 @@ public class ProjectServiceImpl implements ProjectService {
         Project existingProject = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
-        System.out.println(user.getId());
-        System.out.println(existingProject.getId());
 
         userProjectRepository.findByStandardUserAndProject(user, existingProject)
                 .orElseThrow(() -> new IllegalStateException("You are not assigned to this project"));
 
-        List<Technology> technologies = technologyService.findAllById(dto.getTechnologies());
-        if (technologies.size() != dto.getTechnologies().size()) {
-            throw new IllegalArgumentException("Some technology IDs are invalid.");
-        }
-
-        existingProject.setName(dto.getName());
-        existingProject.setCompanyName(dto.getCompanyName());
-        existingProject.setDescription(dto.getDescription());
-        existingProject.setStartDate(dto.getStartDate());
-        existingProject.setEndDate(dto.getEndDate());
-        existingProject.setTechnologies(technologies);
-        existingProject.setUpdatedAt(LocalDateTime.now());
-
-        Project updatedProject = projectRepository.save(existingProject);
-
-        LocalDateTime now = LocalDateTime.now();
-
-        Optional<UserProject> userProjectOpt = userProjectRepository
-                .findByProjectIdAndStandardUserIdAndProjectRole(projectId, dto.getUserId(), oldRole);
-
-        if (userProjectOpt.isPresent()) {
-
-            boolean roleExists = userProjectRepository.existsByProjectIdAndStandardUserIdAndProjectRole(projectId, dto.getUserId(), dto.getProjectRole());
-            if (roleExists && !oldRole.equals(dto.getProjectRole())) {
-                throw new IllegalArgumentException("User already has this role in the project.");
-            }
-
-            UserProject userProject = userProjectOpt.get();
-            userProject.setProjectRole(dto.getProjectRole());
-            userProject.setUpdatedAt(now);
-            userProjectRepository.save(userProject);
-        } else {
-            UserProject newUserProject = UserProject.builder()
-                    .project(updatedProject)
-                    .standardUser(user)
-                    .projectRole(dto.getProjectRole())
-                    .createdAt(now)
-                    .updatedAt(now)
-                    .build();
-
-            userProjectRepository.save(newUserProject);
-
-            updatedProject.getUsers().add(newUserProject);
-            user.getProjects().add(newUserProject);
-        }
-
-        return updatedProject;
+        return getProject(projectId, dto, oldRole, user, existingProject);
     }
+
 
     @Override
     public Project updateProjectAdmin(Integer projectId, ProjectRequestDto dto, String oldRole) {
@@ -166,55 +177,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         StandardUser user = userService.findById(dto.getUserId());
 
-        List<Technology> technologies = technologyService.findAllById(dto.getTechnologies());
-        if (technologies.size() != dto.getTechnologies().size()) {
-            throw new IllegalArgumentException("Some technology IDs are invalid.");
-        }
-
-        existingProject.setName(dto.getName());
-        existingProject.setCompanyName(dto.getCompanyName());
-        existingProject.setDescription(dto.getDescription());
-        existingProject.setStartDate(dto.getStartDate());
-        existingProject.setEndDate(dto.getEndDate());
-        existingProject.setTechnologies(technologies);
-        existingProject.setUpdatedAt(LocalDateTime.now());
-
-        Project updatedProject = projectRepository.save(existingProject);
-
-        LocalDateTime now = LocalDateTime.now();
-
-        Optional<UserProject> userProjectOpt = userProjectRepository
-                .findByProjectIdAndStandardUserIdAndProjectRole(projectId, dto.getUserId(), oldRole);
-
-        if (userProjectOpt.isPresent()) {
-
-            boolean roleExists = userProjectRepository.existsByProjectIdAndStandardUserIdAndProjectRole(projectId, dto.getUserId(), dto.getProjectRole());
-            if (roleExists && !oldRole.equals(dto.getProjectRole())) {
-                throw new IllegalArgumentException("User already has this role in the project.");
-            }
-
-            UserProject userProject = userProjectOpt.get();
-            userProject.setProjectRole(dto.getProjectRole());
-            userProject.setUpdatedAt(now);
-            userProjectRepository.save(userProject);
-        } else {
-            UserProject newUserProject = UserProject.builder()
-                    .project(updatedProject)
-                    .standardUser(user)
-                    .projectRole(dto.getProjectRole())
-                    .createdAt(now)
-                    .updatedAt(now)
-                    .build();
-
-            userProjectRepository.save(newUserProject);
-
-            updatedProject.getUsers().add(newUserProject);
-            user.getProjects().add(newUserProject);
-        }
-
-        return updatedProject;
+        return getProject(projectId, dto, oldRole, user, existingProject);
     }
-
 
 
     @Override
@@ -258,62 +222,54 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.saveAll(projects);
     }
 
-    public ProjectResponseDto toProjectResponseDto(Project project) {
-        ProjectResponseDto dto = new ProjectResponseDto();
-        dto.setProjectId(project.getId());
-        dto.setName(project.getName());
-        dto.setCompanyName(project.getCompanyName());
-        dto.setDescription(project.getDescription());
-        dto.setStartDate(project.getStartDate());
-        dto.setEndDate(project.getEndDate());
-        dto.setCreateAt(project.getCreatedAt());
-        dto.setUpdatedAt(project.getUpdatedAt());
 
-        List<StandardUserProjectResponseDto> userDtos = project.getUsers().stream()
-                .map(userProject -> {
-                    StandardUser user = userProject.getStandardUser();
-
-                    StandardUserProjectResponseDto userDto = new StandardUserProjectResponseDto();
-                    userDto.setId(user.getId());
-                    userDto.setEmail(user.getEmail());
-                    userDto.setName(user.getName());
-                    userDto.setSurname(user.getSurname());
-                    userDto.setPhoneNumber(user.getPhoneNumber());
-                    userDto.setWorkRole(user.getWorkRole());
-                    userDto.setBio(user.getBio());
-                    userDto.setProjectRole(userProject.getProjectRole());
-
-                    return userDto;
-                })
-                .collect(Collectors.toList());
-
-        dto.setUsers(userDtos);
-
-        // Map technologies
-        List<TechnologyResponseDto> techDtos = project.getTechnologies().stream()
-                .map(technologyService::toTechnologyDto)
-                .collect(Collectors.toList());
-        dto.setTechnologies(techDtos);
-
-        return dto;
-    }
-
-    public List<ProjectResponseDto> getProjectsForUser(String email) {
-        StandardUser user = userService.findByEmail(email);
-
-        List<Project> projects = user.getProjects().stream()
-                .map(UserProject::getProject)
-                .distinct()
-                .toList();
-
-        if (projects.isEmpty()) {
-            return null;
+    private Project getProject(Integer projectId, ProjectRequestDto dto, String oldRole, StandardUser user, Project existingProject) {
+        List<Technology> technologies = technologyService.findAllById(dto.getTechnologies());
+        if (technologies.size() != dto.getTechnologies().size()) {
+            throw new IllegalArgumentException("Some technology IDs are invalid.");
         }
 
-        return projects.stream()
-                .map(this::toProjectResponseDto)
-                .collect(Collectors.toList());
+        existingProject.setName(dto.getName());
+        existingProject.setCompanyName(dto.getCompanyName());
+        existingProject.setDescription(dto.getDescription());
+        existingProject.setStartDate(dto.getStartDate());
+        existingProject.setEndDate(dto.getEndDate());
+        existingProject.setTechnologies(technologies);
+        existingProject.setUpdatedAt(LocalDateTime.now());
+
+        Project updatedProject = projectRepository.save(existingProject);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        Optional<UserProject> userProjectOpt = userProjectRepository
+                .findByProjectIdAndStandardUserIdAndProjectRole(projectId, dto.getUserId(), oldRole);
+
+        if (userProjectOpt.isPresent()) {
+
+            boolean roleExists = userProjectRepository.existsByProjectIdAndStandardUserIdAndProjectRole(projectId, dto.getUserId(), dto.getProjectRole());
+            if (roleExists && !oldRole.equals(dto.getProjectRole())) {
+                throw new IllegalArgumentException("User already has this role in the project.");
+            }
+
+            UserProject userProject = userProjectOpt.get();
+            userProject.setProjectRole(dto.getProjectRole());
+            userProject.setUpdatedAt(now);
+            userProjectRepository.save(userProject);
+        } else {
+            UserProject newUserProject = UserProject.builder()
+                    .project(updatedProject)
+                    .standardUser(user)
+                    .projectRole(dto.getProjectRole())
+                    .createdAt(now)
+                    .updatedAt(now)
+                    .build();
+
+            userProjectRepository.save(newUserProject);
+
+            updatedProject.getUsers().add(newUserProject);
+            user.getProjects().add(newUserProject);
+        }
+
+        return updatedProject;
     }
-
-
 }

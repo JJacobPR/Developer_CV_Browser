@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TechnologyResponseDto {
 
-    private int id;
+    private Integer id;
     private String name;
     private TechnologyType type;
     private LocalDateTime createdAt;

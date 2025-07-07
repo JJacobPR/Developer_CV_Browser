@@ -33,6 +33,6 @@ public class StandardUser extends UserEntity {
     private String bio;
 
     @Builder.Default
-    @OneToMany(mappedBy = "standardUser")
+    @OneToMany(mappedBy = "standardUser", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<UserProject> projects = new HashSet<>();
 }

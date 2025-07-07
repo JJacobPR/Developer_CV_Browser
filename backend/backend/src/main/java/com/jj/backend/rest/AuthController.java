@@ -64,7 +64,6 @@ public class AuthController {
             LoginResponseDto response = userService.buildResponse(user, token);
 
             return ResponseEntity.ok(response);
-
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (UsernameNotFoundException | IllegalStateException ex) {

@@ -1,6 +1,5 @@
 package com.jj.backend.service.impl;
 
-import com.jj.backend.config.TechnologyType;
 import com.jj.backend.dto.TechnologyRequestDto;
 import com.jj.backend.dto.TechnologyResponseDto;
 import com.jj.backend.entity.Technology;
@@ -27,7 +26,7 @@ public class TechnologyServiceImpl implements TechnologyService {
     private final UserProjectRepository userProjectRepository;
     private final StandardUserRepository standardUserRepository;
 
-    public TechnologyServiceImpl(TechnologyRepository technologyRepository,@Lazy ProjectService projectService, UserProjectRepository userProjectRepository, StandardUserRepository standardUserRepository) {
+    public TechnologyServiceImpl(TechnologyRepository technologyRepository, @Lazy ProjectService projectService, UserProjectRepository userProjectRepository, StandardUserRepository standardUserRepository) {
         this.technologyRepository = technologyRepository;
         this.projectService = projectService;
         this.userProjectRepository = userProjectRepository;
@@ -35,42 +34,24 @@ public class TechnologyServiceImpl implements TechnologyService {
     }
 
     @Override
-    public List<Technology> getTechnologies() {
-        return technologyRepository.findAll();
-    }
-
-
-    @Override
-    public List<Technology> getTechnologiesByUser(Integer userId) {
-        boolean userExists = standardUserRepository.existsById(userId);
-        if (!userExists) {
-            throw new IllegalArgumentException("User with id " + userId + " does not exist.");
-        }
-        return userProjectRepository.findTechnologiesByUserId(userId);
-    }
-
-
-    @Override
-    public Technology saveTechnology(Technology technology) {
-        return technologyRepository.save(technology);
-    }
-
-    @Override
     public Technology buildTechnology(TechnologyRequestDto technologyRequestDto) {
-        String name = technologyRequestDto.getName();
-
-        if (technologyRepository.existsByName(name)) {
-            throw new IllegalArgumentException("Technology with name '" + name + "' already exists.");
+        if (technologyRepository.existsByName(technologyRequestDto.getName())) {
+            throw new IllegalArgumentException("Technology with name '" + technologyRequestDto.getName() + "' already exists.");
         }
 
         LocalDateTime now = LocalDateTime.now();
 
         return Technology.builder()
-                .name(name)
+                .name(technologyRequestDto.getName())
                 .type(technologyRequestDto.getType())
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
+    }
+
+    @Override
+    public Technology saveTechnology(Technology technology) {
+        return technologyRepository.save(technology);
     }
 
     @Override
@@ -101,6 +82,41 @@ public class TechnologyServiceImpl implements TechnologyService {
 
 
     @Override
+    public List<Technology> getTechnologies() {
+        return technologyRepository.findAll();
+    }
+
+
+    @Override
+    public List<Technology> getTechnologiesByUser(Integer userId) {
+        boolean userExists = standardUserRepository.existsById(userId);
+        if (!userExists) {
+            throw new IllegalArgumentException("User with id " + userId + " does not exist.");
+        }
+        return userProjectRepository.findTechnologiesByUserId(userId);
+    }
+
+    @Override
+    public List<Technology> findAllById(List<Integer> technologies) {
+        return technologyRepository.findAllById(technologies);
+    }
+
+    @Override
+    public TechnologyResponseDto toTechnologyDto(Technology technology) {
+        if (technology == null) {
+            return null;
+        }
+
+        return new TechnologyResponseDto(
+                technology.getId(),
+                technology.getName(),
+                technology.getType(),
+                technology.getCreatedAt(),
+                technology.getUpdatedAt()
+        );
+    }
+
+    @Override
     public List<TechnologyResponseDto> toDtoList(List<Technology> technologies) {
         if (technologies == null) {
             return Collections.emptyList();
@@ -115,24 +131,4 @@ public class TechnologyServiceImpl implements TechnologyService {
                 ))
                 .collect(Collectors.toList());
     }
-
-    @Override
-    public TechnologyResponseDto toTechnologyDto(Technology technology) {
-        if (technology == null) {
-            return null;
-        }
-        return new TechnologyResponseDto(
-                technology.getId(),
-                technology.getName(),
-                technology.getType(),
-                technology.getCreatedAt(),
-                technology.getUpdatedAt()
-        );
-    }
-
-    @Override
-    public List<Technology> findAllById(List<Integer> technologies) {
-        return technologyRepository.findAllById(technologies);
-    }
-
 }

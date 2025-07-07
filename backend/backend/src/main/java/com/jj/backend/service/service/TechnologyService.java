@@ -1,6 +1,5 @@
 package com.jj.backend.service.service;
 
-import com.jj.backend.config.TechnologyType;
 import com.jj.backend.dto.TechnologyRequestDto;
 import com.jj.backend.dto.TechnologyResponseDto;
 import com.jj.backend.entity.Technology;
@@ -8,13 +7,20 @@ import com.jj.backend.entity.Technology;
 import java.util.List;
 
 public interface TechnologyService {
-    List<Technology> getTechnologies();
-    List<Technology> getTechnologiesByUser(Integer userId);
-    Technology saveTechnology(Technology technology);
+
+    // Create, Update, Delete
     Technology buildTechnology(TechnologyRequestDto technologyRequestDto);
+    Technology saveTechnology(Technology technology);
     Technology updateTechnology(Integer technologyId, TechnologyRequestDto dto);
     void deleteTechnology(Integer id);
-    List<TechnologyResponseDto> toDtoList(List<Technology> technologies);
-    TechnologyResponseDto toTechnologyDto(Technology technology);
+
+    // Read / Find
+    List<Technology> getTechnologies();
+    List<Technology> getTechnologiesByUser(Integer userId);
     List<Technology> findAllById(List<Integer> technologies);
+
+    // Mapping / DTO conversions
+    TechnologyResponseDto toTechnologyDto(Technology technology);
+    List<TechnologyResponseDto> toDtoList(List<Technology> technologies);
 }
+

@@ -15,17 +15,23 @@ import java.util.Optional;
 
 public interface UserService {
 
-
-    PagingResult<StandardUser> findAll(PaginationRequest request);
-    List<StandardUserFullResponseDto> mapToFullUserDtos(List<StandardUser> users);
-    List<RoleName>getRolesByEmail(String email);
-    Optional<UserEntity> getUserByEmail(String email);
-    UserEntity saveUser(UserEntity user);
+    // Create, Update, Delete
     UserEntity createStandardUser(StandardUserRequestDto dto);
     UserEntity updateStandardUser(StandardUserRequestDto dto, Integer id);
     void deleteUser(Integer id);
-    LoginResponseDto buildResponse(UserEntity user, String token);
-    StandardUserCreateResponseDto toStandardUserResponseDto(UserEntity user);
+    UserEntity saveUser(UserEntity user);
+
+    // Read / Find
+    Optional<UserEntity> getUserByEmail(String email);
     StandardUser findById(Integer userId);
     StandardUser findByEmail(String email);
+    PagingResult<StandardUser> findAll(PaginationRequest request);
+    List<RoleName> getRolesByEmail(String email);
+
+    // Mapping / DTO conversions
+    List<StandardUserFullResponseDto> mapToFullUserDtos(List<StandardUser> users);
+    StandardUserCreateResponseDto toStandardUserResponseDto(UserEntity user);
+
+    // Authentication / Response building
+    LoginResponseDto buildResponse(UserEntity user, String token);
 }

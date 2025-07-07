@@ -13,7 +13,6 @@ public class RequestLoggingFilterConfig {
                 = new CommonsRequestLoggingFilter();
         filter.setIncludeQueryString(true);
         filter.setIncludeHeaders(false);
-        filter.setAfterMessagePrefix("REQUEST DATA: ");
         return filter;
     }
 }
