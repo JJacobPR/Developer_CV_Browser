@@ -1,14 +1,19 @@
 package com.jj.backend.rest;
 
+import com.jj.backend.dto.StandardUserCreateResponseDto;
 import com.jj.backend.dto.StandardUserFullResponseDto;
 import com.jj.backend.dto.StandardUserRequestDto;
 import com.jj.backend.entity.StandardUser;
 import com.jj.backend.entity.UserEntity;
+import com.jj.backend.pagination.PaginationRequest;
+import com.jj.backend.pagination.PagingResult;
 import com.jj.backend.service.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,15 +32,20 @@ public class UserController {
     }
 
 
-    @GetMapping("/")
+    @GetMapping
     @Operation(
             summary = "Get all users with their full profile and project information",
             description = "Returns a list of all users including their personal info and associated projects",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    public ResponseEntity<List<StandardUserFullResponseDto>> getAllUsersWithProjects() {
-        List<StandardUser> users = userService.getAllStandardUsers();
-        List<StandardUserFullResponseDto> dtos = userService.mapToFullUserDtos(users);
+    public ResponseEntity<List<StandardUserFullResponseDto>> getAllUsersWithProjects(@RequestParam(defaultValue = "0") int page,
+                                                                                     @RequestParam(defaultValue = "10") int size,
+                                                                                     @RequestParam(defaultValue = "id") String sortField,
+                                                                                     @RequestParam(defaultValue = "DESC")Sort.Direction direction) {
+
+        PaginationRequest paginationRequest = new PaginationRequest(page, size, sortField, direction);
+        PagingResult<StandardUser> users = userService.findAll(paginationRequest);
+        List<StandardUserFullResponseDto> dtos = userService.mapToFullUserDtos(users.getContent().stream().toList());
         return ResponseEntity.ok(dtos);
     }
 
@@ -55,16 +65,9 @@ public class UserController {
     })
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> addStandardUser(@RequestBody StandardUserRequestDto dto) {
-        try {
+    public ResponseEntity<StandardUserCreateResponseDto> addStandardUser(@RequestBody StandardUserRequestDto dto) {
             UserEntity createdUser = userService.createStandardUser(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(userService.toStandardUserResponseDto(createdUser));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Unexpected error: " + e.getMessage());
-        }
     }
 
     @Operation(
@@ -83,16 +86,9 @@ public class UserController {
     })
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateStandardUser(@PathVariable Integer id, @RequestBody StandardUserRequestDto dto) {
-        try {
+    public ResponseEntity<StandardUserCreateResponseDto> updateStandardUser(@PathVariable Integer id, @RequestBody StandardUserRequestDto dto) {
             UserEntity updatedUser = userService.updateStandardUser(dto, id);
             return ResponseEntity.ok(userService.toStandardUserResponseDto(updatedUser));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Unexpected error: " + e.getMessage());
-        }
     }
 
     @Operation(
@@ -108,18 +104,9 @@ public class UserController {
     })
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") Integer id) {
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Unexpected error: " + e.getMessage());
-        }
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Integer id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

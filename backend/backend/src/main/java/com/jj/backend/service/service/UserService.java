@@ -7,6 +7,8 @@ import com.jj.backend.dto.StandardUserFullResponseDto;
 import com.jj.backend.dto.StandardUserRequestDto;
 import com.jj.backend.entity.StandardUser;
 import com.jj.backend.entity.UserEntity;
+import com.jj.backend.pagination.PaginationRequest;
+import com.jj.backend.pagination.PagingResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,10 +16,8 @@ import java.util.Optional;
 public interface UserService {
 
 
-    List<StandardUser> getAllStandardUsers();
-
+    PagingResult<StandardUser> findAll(PaginationRequest request);
     List<StandardUserFullResponseDto> mapToFullUserDtos(List<StandardUser> users);
-
     List<RoleName>getRolesByEmail(String email);
     Optional<UserEntity> getUserByEmail(String email);
     UserEntity saveUser(UserEntity user);

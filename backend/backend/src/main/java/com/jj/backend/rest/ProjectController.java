@@ -3,7 +3,6 @@ package com.jj.backend.rest;
 import com.jj.backend.dto.ProjectRequestDto;
 import com.jj.backend.dto.ProjectResponseDto;
 import com.jj.backend.entity.Project;
-import com.jj.backend.error.ResourceNotFoundException;
 import com.jj.backend.service.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,13 +40,8 @@ public class ProjectController {
             @ApiResponse(responseCode = "500", description = "Unexpected server error")
     })
     public ResponseEntity<List<ProjectResponseDto>> getAllProjects() {
-        try {
-            List<ProjectResponseDto> projects = projectService.getAllProjects();
-            return ResponseEntity.ok(projects);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(null);
-        }
+        List<ProjectResponseDto> projects = projectService.getAllProjects();
+        return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/my-projects")
@@ -64,15 +57,10 @@ public class ProjectController {
             @ApiResponse(responseCode = "403", description = "Forbidden: Invalid role"),
             @ApiResponse(responseCode = "500", description = "Unexpected server error")
     })
-    public ResponseEntity<?> getMyProjects(Principal principal) {
-        try {
-            String email = principal.getName();
-            List<ProjectResponseDto> projects = projectService.getProjectsForUser(email);
-            return ResponseEntity.ok(projects);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Unexpected error: " + e.getMessage());
-        }
+    public ResponseEntity<List<ProjectResponseDto>> getMyProjects(Principal principal) {
+        String email = principal.getName();
+        List<ProjectResponseDto> projects = projectService.getProjectsForUser(email);
+        return ResponseEntity.ok(projects);
     }
 
     @PostMapping
@@ -88,16 +76,9 @@ public class ProjectController {
             @ApiResponse(responseCode = "400", description = "Bad request - user or technologies not found"),
             @ApiResponse(responseCode = "500", description = "Unexpected server error")
     })
-    public ResponseEntity<?> createProject(@RequestBody ProjectRequestDto projectDto) {
-        try {
-            Project createdProject = projectService.createProject(projectDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(projectService.toProjectResponseDto(createdProject));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Unexpected error: " + e.getMessage());
-        }
+    public ResponseEntity<ProjectResponseDto> createProject(@RequestBody ProjectRequestDto projectDto) {
+        Project createdProject = projectService.createProject(projectDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.toProjectResponseDto(createdProject));
     }
 
     @PutMapping("/admin/{projectId}/{role}")
@@ -114,21 +95,12 @@ public class ProjectController {
             @ApiResponse(responseCode = "404", description = "Project or user-project relation not found"),
             @ApiResponse(responseCode = "500", description = "Unexpected server error")
     })
-    public ResponseEntity<?> updateProjectAdmin(
+    public ResponseEntity<ProjectResponseDto> updateProjectAdmin(
             @PathVariable Integer projectId,
             @PathVariable String role,
             @RequestBody ProjectRequestDto dto) {
-        try {
-            Project updatedProject = projectService.updateProjectAdmin(projectId, dto, role);
-            return ResponseEntity.ok().body(projectService.toProjectResponseDto(updatedProject));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Unexpected error: " + e.getMessage());
-        }
+        Project updatedProject = projectService.updateProjectAdmin(projectId, dto, role);
+        return ResponseEntity.ok().body(projectService.toProjectResponseDto(updatedProject));
     }
 
 
@@ -146,25 +118,16 @@ public class ProjectController {
             @ApiResponse(responseCode = "404", description = "Project or user-project relation not found"),
             @ApiResponse(responseCode = "500", description = "Unexpected server error")
     })
-    public ResponseEntity<?> updateProjectUser(
+    public ResponseEntity<ProjectResponseDto> updateProjectUser(
             @PathVariable Integer projectId,
             @PathVariable String role,
             @RequestBody ProjectRequestDto dto,
             Principal principal) {
-        try {
-            String email = principal.getName();
-            Project updatedProject = projectService.updateProjectUser(projectId, dto, role, email);
-            return ResponseEntity.ok().body(projectService.toProjectResponseDto(updatedProject));
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Unexpected error: " + e.getMessage());
-        }
-    }
+        String email = principal.getName();
+        Project updatedProject = projectService.updateProjectUser(projectId, dto, role, email);
+        return ResponseEntity.ok().body(projectService.toProjectResponseDto(updatedProject));
 
+    }
 
 
     @DeleteMapping("/{projectId}")
@@ -179,19 +142,10 @@ public class ProjectController {
             @ApiResponse(responseCode = "403", description = "Forbidden: not own project"),
             @ApiResponse(responseCode = "404", description = "Project or user-project not found")
     })
-    public ResponseEntity<?> deleteUserProject(@PathVariable Integer projectId, Principal principal) {
-        try {
-            String email = principal.getName();
-            projectService.deleteProjectUser(projectId, email);
-            return ResponseEntity.noContent().build();
-        } catch (AccessDeniedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (ResourceNotFoundException | IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Unexpected error: " + e.getMessage());
-        }
+    public ResponseEntity<Void> deleteUserProject(@PathVariable Integer projectId, Principal principal) {
+        String email = principal.getName();
+        projectService.deleteProjectUser(projectId, email);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/admin/{projectId}")
@@ -207,18 +161,10 @@ public class ProjectController {
             @ApiResponse(responseCode = "404", description = "Project or user-project not found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized: Authentication required")
     })
-    public ResponseEntity<?> deleteAdminProject(@PathVariable Integer projectId) {
-        try {
-            projectService.deleteProjectAdmin(projectId);
-            return ResponseEntity.noContent().build();
-        } catch (ResourceNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Unexpected error: " + e.getMessage());
-        }
+    public ResponseEntity<Void> deleteAdminProject(@PathVariable Integer projectId) {
+        projectService.deleteProjectAdmin(projectId);
+        return ResponseEntity.noContent().build();
+
     }
 
 }

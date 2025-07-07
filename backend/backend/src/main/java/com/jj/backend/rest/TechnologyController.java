@@ -54,17 +54,10 @@ public class TechnologyController {
     })
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public ResponseEntity<?> getAllTechnologiesByUser(@RequestParam int id) {
-        try {
+    public ResponseEntity<List<TechnologyResponseDto>> getAllTechnologiesByUser(@RequestParam int id) {
             List<Technology> technologies = technologyService.getTechnologiesByUser(id);
             List<TechnologyResponseDto> technologyResponseDtos = technologyService.toDtoList(technologies);
             return ResponseEntity.ok(technologyResponseDtos);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred: " + e.getMessage());
-        }
     }
 
     @Operation(summary = "Add a new technology",
@@ -77,19 +70,11 @@ public class TechnologyController {
     })
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> addTechnology(@RequestBody TechnologyRequestDto dto) {
-        try {
+    public ResponseEntity<TechnologyResponseDto> addTechnology(@RequestBody TechnologyRequestDto dto) {
             Technology technology = technologyService.buildTechnology(dto);
             Technology createdTech = technologyService.saveTechnology(technology);
             TechnologyResponseDto technologyResponseDto = technologyService.toTechnologyDto(createdTech);
             return ResponseEntity.ok(technologyResponseDto);
-        } catch (IllegalArgumentException e) {
-            // Handle duplicate name or invalid input
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred: " + e.getMessage());
-        }
     }
 
     @Operation(summary = "Update an existing technology",
@@ -102,17 +87,10 @@ public class TechnologyController {
     })
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateTechnology(@PathVariable int id, @RequestBody TechnologyRequestDto dto) {
-        try {
+    public ResponseEntity<TechnologyResponseDto> updateTechnology(@PathVariable int id, @RequestBody TechnologyRequestDto dto) {
             Technology updatedTech = technologyService.updateTechnology(id, dto);
             TechnologyResponseDto technologyResponseDto = technologyService.toTechnologyDto(updatedTech);
             return ResponseEntity.ok(technologyResponseDto);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred: " + e.getMessage());
-        }
     }
 
     @Operation(summary = "Delete a technology",

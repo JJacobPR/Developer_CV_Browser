@@ -6,6 +6,9 @@ import com.jj.backend.entity.Role;
 import com.jj.backend.entity.StandardUser;
 import com.jj.backend.entity.UserEntity;
 import com.jj.backend.entity.UserProject;
+import com.jj.backend.pagination.PaginationRequest;
+import com.jj.backend.pagination.PaginationUtils;
+import com.jj.backend.pagination.PagingResult;
 import com.jj.backend.repository.RoleRepository;
 import com.jj.backend.repository.StandardUserRepository;
 import com.jj.backend.repository.UserEntityRepository;
@@ -14,6 +17,8 @@ import com.jj.backend.service.service.ProjectService;
 import com.jj.backend.service.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -49,9 +54,20 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+
     @Override
-    public List<StandardUser> getAllStandardUsers() {
-        return standardUserRepository.findAll();
+    public PagingResult<StandardUser> findAll(PaginationRequest request) {
+        Pageable pageable = PaginationUtils.getPageable(request.getPage(), request.getSize(), request.getDirection(), request.getSortField());
+        Page<StandardUser> users = standardUserRepository.findAll(pageable);
+
+        return new PagingResult<>(
+                users.getContent(),
+                users.getTotalPages(),
+                users.getTotalElements(),
+                users.getSize(),
+                users.getNumber(),
+                users.isEmpty()
+        );
     }
 
 
