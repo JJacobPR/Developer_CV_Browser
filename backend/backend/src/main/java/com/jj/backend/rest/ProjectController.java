@@ -3,6 +3,7 @@ package com.jj.backend.rest;
 import com.jj.backend.dto.ProjectRequestDto;
 import com.jj.backend.dto.ProjectResponseDto;
 import com.jj.backend.entity.Project;
+import com.jj.backend.error.ResourceNotFoundException;
 import com.jj.backend.service.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -91,6 +93,34 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.CREATED).body(projectService.toProjectResponseDto(createdProject));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error: " + e.getMessage());
+        }
+    }
+
+
+    @DeleteMapping("/{projectId}")
+    @PreAuthorize("hasRole('USER')") // or more specific if needed
+    @Operation(
+            summary = "Delete a project for the current user",
+            description = "Allows a user to delete their own project. Only deletes the project if no other users are assigned.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Project deleted or user unassigned"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: not own project"),
+            @ApiResponse(responseCode = "404", description = "Project or user-project not found")
+    })
+    public ResponseEntity<?> deleteUserProject(@PathVariable Integer projectId, Principal principal) {
+        try {
+            String email = principal.getName();
+            projectService.deleteProjectUser(projectId, email);
+            return ResponseEntity.noContent().build();
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (ResourceNotFoundException | IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Unexpected error: " + e.getMessage());

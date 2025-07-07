@@ -5,14 +5,16 @@ import com.jj.backend.dto.ProjectResponseDto;
 import com.jj.backend.dto.StandardUserProjectResponseDto;
 import com.jj.backend.dto.TechnologyResponseDto;
 import com.jj.backend.entity.*;
+import com.jj.backend.error.ResourceNotFoundException;
 import com.jj.backend.repository.ProjectRepository;
+import com.jj.backend.repository.StandardUserRepository;
 import com.jj.backend.repository.UserProjectRepository;
 import com.jj.backend.service.service.ProjectService;
 import com.jj.backend.service.service.TechnologyService;
 import com.jj.backend.service.service.UserService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,12 +26,14 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserService userService;
     private final TechnologyService technologyService;
     private final UserProjectRepository userProjectRepository;
+    private final StandardUserRepository standardUserRepository;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, UserService userService, TechnologyService technologyService, UserProjectRepository userProjectRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, UserService userService, TechnologyService technologyService, UserProjectRepository userProjectRepository, StandardUserRepository standardUserRepository) {
         this.projectRepository = projectRepository;
         this.userService = userService;
         this.technologyService = technologyService;
         this.userProjectRepository = userProjectRepository;
+        this.standardUserRepository = standardUserRepository;
     }
 
     @Override
@@ -93,9 +97,28 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteProject(int id) {
+    public void deleteProjectUser(Integer projectId, String userEmail) {
+        StandardUser user = standardUserRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+        UserProject userProject = userProjectRepository.findByStandardUserAndProject(user, project)
+                .orElseThrow(() -> new IllegalStateException("You are not assigned to this project"));
+
+
+        // Count how many users are assigned
+        long count = userProjectRepository.countByProject(project);
+
+        if (count == 1) {
+            projectRepository.delete(project);
+        } else {
+            // Other users exist — just remove this user's relation
+            userProjectRepository.delete(userProject);
+        }
     }
+
 
     @Override
     public void removeTechnologyFromAllProjects(Technology technology) {
@@ -108,6 +131,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     public ProjectResponseDto toProjectResponseDto(Project project) {
         ProjectResponseDto dto = new ProjectResponseDto();
+        dto.setProjectId(project.getId());
         dto.setName(project.getName());
         dto.setCompanyName(project.getCompanyName());
         dto.setDescription(project.getDescription());

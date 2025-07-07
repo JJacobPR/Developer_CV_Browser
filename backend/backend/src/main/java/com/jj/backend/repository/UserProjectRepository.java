@@ -1,5 +1,7 @@
 package com.jj.backend.repository;
 
+import com.jj.backend.entity.Project;
+import com.jj.backend.entity.StandardUser;
 import com.jj.backend.entity.Technology;
 import com.jj.backend.entity.UserProject;
 import jakarta.transaction.Transactional;
@@ -10,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserProjectRepository extends JpaRepository<UserProject, Integer> {
@@ -25,4 +28,8 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Intege
     @Transactional
     @Query("DELETE FROM UserProject up WHERE up.standardUser.id = :userId")
     void deleteByStandardUserId(@Param("userId") int userId);
+
+    Optional<UserProject> findByStandardUserAndProject(StandardUser user, Project project);
+
+    int countByProject(Project project);
 }

@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ProjectResponseDto {
 
+    private Integer projectId;
     private String name;
     private String companyName;
     private String description;

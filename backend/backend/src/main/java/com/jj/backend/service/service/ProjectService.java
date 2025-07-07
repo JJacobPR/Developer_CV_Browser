@@ -11,7 +11,7 @@ public interface ProjectService {
     List<ProjectResponseDto> getAllProjects();
     Project saveProject(Project project);
     Project createProject(ProjectRequestDto projectRequestDto);
-    void deleteProject(int id);
+    void deleteProjectUser(Integer projectId, String userEmail);
     void removeTechnologyFromAllProjects(Technology technology);
     ProjectResponseDto toProjectResponseDto(Project project);
     List<ProjectResponseDto> getProjectsForUser(String email);
