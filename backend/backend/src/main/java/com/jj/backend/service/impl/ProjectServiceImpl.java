@@ -14,9 +14,9 @@ import com.jj.backend.service.service.TechnologyService;
 import com.jj.backend.service.service.UserService;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,7 +47,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project saveProject(Project project) {
-        return null;
+        return projectRepository.save(project);
     }
 
     @Override
@@ -97,6 +97,127 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public Project updateProjectUser(Integer projectId, ProjectRequestDto dto, String oldRole, String userEmail) {
+        StandardUser user = standardUserRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Project existingProject = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+        System.out.println(user.getId());
+        System.out.println(existingProject.getId());
+
+        userProjectRepository.findByStandardUserAndProject(user, existingProject)
+                .orElseThrow(() -> new IllegalStateException("You are not assigned to this project"));
+
+        List<Technology> technologies = technologyService.findAllById(dto.getTechnologies());
+        if (technologies.size() != dto.getTechnologies().size()) {
+            throw new IllegalArgumentException("Some technology IDs are invalid.");
+        }
+
+        existingProject.setName(dto.getName());
+        existingProject.setCompanyName(dto.getCompanyName());
+        existingProject.setDescription(dto.getDescription());
+        existingProject.setStartDate(dto.getStartDate());
+        existingProject.setEndDate(dto.getEndDate());
+        existingProject.setTechnologies(technologies);
+        existingProject.setUpdatedAt(LocalDateTime.now());
+
+        Project updatedProject = projectRepository.save(existingProject);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        Optional<UserProject> userProjectOpt = userProjectRepository
+                .findByProjectIdAndStandardUserIdAndProjectRole(projectId, dto.getUserId(), oldRole);
+
+        if (userProjectOpt.isPresent()) {
+
+            boolean roleExists = userProjectRepository.existsByProjectIdAndStandardUserIdAndProjectRole(projectId, dto.getUserId(), dto.getProjectRole());
+            if (roleExists && !oldRole.equals(dto.getProjectRole())) {
+                throw new IllegalArgumentException("User already has this role in the project.");
+            }
+
+            UserProject userProject = userProjectOpt.get();
+            userProject.setProjectRole(dto.getProjectRole());
+            userProject.setUpdatedAt(now);
+            userProjectRepository.save(userProject);
+        } else {
+            UserProject newUserProject = UserProject.builder()
+                    .project(updatedProject)
+                    .standardUser(user)
+                    .projectRole(dto.getProjectRole())
+                    .createdAt(now)
+                    .updatedAt(now)
+                    .build();
+
+            userProjectRepository.save(newUserProject);
+
+            updatedProject.getUsers().add(newUserProject);
+            user.getProjects().add(newUserProject);
+        }
+
+        return updatedProject;
+    }
+
+    @Override
+    public Project updateProjectAdmin(Integer projectId, ProjectRequestDto dto, String oldRole) {
+        Project existingProject = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+        StandardUser user = userService.findById(dto.getUserId());
+
+        List<Technology> technologies = technologyService.findAllById(dto.getTechnologies());
+        if (technologies.size() != dto.getTechnologies().size()) {
+            throw new IllegalArgumentException("Some technology IDs are invalid.");
+        }
+
+        existingProject.setName(dto.getName());
+        existingProject.setCompanyName(dto.getCompanyName());
+        existingProject.setDescription(dto.getDescription());
+        existingProject.setStartDate(dto.getStartDate());
+        existingProject.setEndDate(dto.getEndDate());
+        existingProject.setTechnologies(technologies);
+        existingProject.setUpdatedAt(LocalDateTime.now());
+
+        Project updatedProject = projectRepository.save(existingProject);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        Optional<UserProject> userProjectOpt = userProjectRepository
+                .findByProjectIdAndStandardUserIdAndProjectRole(projectId, dto.getUserId(), oldRole);
+
+        if (userProjectOpt.isPresent()) {
+
+            boolean roleExists = userProjectRepository.existsByProjectIdAndStandardUserIdAndProjectRole(projectId, dto.getUserId(), dto.getProjectRole());
+            if (roleExists && !oldRole.equals(dto.getProjectRole())) {
+                throw new IllegalArgumentException("User already has this role in the project.");
+            }
+
+            UserProject userProject = userProjectOpt.get();
+            userProject.setProjectRole(dto.getProjectRole());
+            userProject.setUpdatedAt(now);
+            userProjectRepository.save(userProject);
+        } else {
+            UserProject newUserProject = UserProject.builder()
+                    .project(updatedProject)
+                    .standardUser(user)
+                    .projectRole(dto.getProjectRole())
+                    .createdAt(now)
+                    .updatedAt(now)
+                    .build();
+
+            userProjectRepository.save(newUserProject);
+
+            updatedProject.getUsers().add(newUserProject);
+            user.getProjects().add(newUserProject);
+        }
+
+        return updatedProject;
+    }
+
+
+
+    @Override
     public void deleteProjectUser(Integer projectId, String userEmail) {
         StandardUser user = standardUserRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -117,6 +238,14 @@ public class ProjectServiceImpl implements ProjectService {
             // Other users exist — just remove this user's relation
             userProjectRepository.delete(userProject);
         }
+    }
+
+    @Override
+    public void deleteProjectAdmin(Integer projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+        projectRepository.delete(project);
     }
 
 
@@ -177,9 +306,14 @@ public class ProjectServiceImpl implements ProjectService {
                 .distinct()
                 .toList();
 
+        if (projects.isEmpty()) {
+            return null;
+        }
+
         return projects.stream()
                 .map(this::toProjectResponseDto)
                 .collect(Collectors.toList());
     }
+
 
 }

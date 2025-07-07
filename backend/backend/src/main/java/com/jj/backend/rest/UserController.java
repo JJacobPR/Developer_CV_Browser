@@ -1,6 +1,8 @@
 package com.jj.backend.rest;
 
+import com.jj.backend.dto.StandardUserFullResponseDto;
 import com.jj.backend.dto.StandardUserRequestDto;
+import com.jj.backend.entity.StandardUser;
 import com.jj.backend.entity.UserEntity;
 import com.jj.backend.service.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -21,6 +25,20 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
+
+
+    @GetMapping("/")
+    @Operation(
+            summary = "Get all users with their full profile and project information",
+            description = "Returns a list of all users including their personal info and associated projects",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    public ResponseEntity<List<StandardUserFullResponseDto>> getAllUsersWithProjects() {
+        List<StandardUser> users = userService.getAllStandardUsers();
+        List<StandardUserFullResponseDto> dtos = userService.mapToFullUserDtos(users);
+        return ResponseEntity.ok(dtos);
+    }
+
 
     @Operation(
             summary = "Create a new standard user",

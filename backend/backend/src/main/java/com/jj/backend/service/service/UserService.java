@@ -3,6 +3,7 @@ package com.jj.backend.service.service;
 import com.jj.backend.config.RoleName;
 import com.jj.backend.dto.LoginResponseDto;
 import com.jj.backend.dto.StandardUserCreateResponseDto;
+import com.jj.backend.dto.StandardUserFullResponseDto;
 import com.jj.backend.dto.StandardUserRequestDto;
 import com.jj.backend.entity.StandardUser;
 import com.jj.backend.entity.UserEntity;
@@ -12,7 +13,11 @@ import java.util.Optional;
 
 public interface UserService {
 
-    List<UserEntity> getAllUsers();
+
+    List<StandardUser> getAllStandardUsers();
+
+    List<StandardUserFullResponseDto> mapToFullUserDtos(List<StandardUser> users);
+
     List<RoleName>getRolesByEmail(String email);
     Optional<UserEntity> getUserByEmail(String email);
     UserEntity saveUser(UserEntity user);

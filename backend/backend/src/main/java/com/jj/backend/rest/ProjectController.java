@@ -61,6 +61,7 @@ public class ProjectController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Projects retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid or missing token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: Invalid role"),
             @ApiResponse(responseCode = "500", description = "Unexpected server error")
     })
     public ResponseEntity<?> getMyProjects(Principal principal) {
@@ -99,6 +100,72 @@ public class ProjectController {
         }
     }
 
+    @PutMapping("/admin/{projectId}/{role}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Admin: Update a user's role or project data",
+            description = "Allows an admin to update project details and a specific user's role in the project. " +
+                    "The user's old role must be provided in the path. If the user-role combination does not exist, a new relation is created.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Project updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request or role conflict"),
+            @ApiResponse(responseCode = "404", description = "Project or user-project relation not found"),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error")
+    })
+    public ResponseEntity<?> updateProjectAdmin(
+            @PathVariable Integer projectId,
+            @PathVariable String role,
+            @RequestBody ProjectRequestDto dto) {
+        try {
+            Project updatedProject = projectService.updateProjectAdmin(projectId, dto, role);
+            return ResponseEntity.ok().body(projectService.toProjectResponseDto(updatedProject));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error: " + e.getMessage());
+        }
+    }
+
+
+    @PutMapping("/{projectId}/{role}")
+    @PreAuthorize("hasRole('USER')")
+    @Operation(
+            summary = "User: Update own role or project data",
+            description = "Allows a user to update their own project details and role in a specific project. " +
+                    "The user's current role must be included in the path.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Project updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data or role conflict"),
+            @ApiResponse(responseCode = "404", description = "Project or user-project relation not found"),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error")
+    })
+    public ResponseEntity<?> updateProjectUser(
+            @PathVariable Integer projectId,
+            @PathVariable String role,
+            @RequestBody ProjectRequestDto dto,
+            Principal principal) {
+        try {
+            String email = principal.getName();
+            Project updatedProject = projectService.updateProjectUser(projectId, dto, role, email);
+            return ResponseEntity.ok().body(projectService.toProjectResponseDto(updatedProject));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error: " + e.getMessage());
+        }
+    }
+
+
 
     @DeleteMapping("/{projectId}")
     @PreAuthorize("hasRole('USER')") // or more specific if needed
@@ -121,6 +188,33 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (ResourceNotFoundException | IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/admin/{projectId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Delete a project for the current user",
+            description = "Allows an admin to delete a project. Only deletes the project if no other users are assigned.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Project deleted or user unassigned"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: not authorized to delete this project"),
+            @ApiResponse(responseCode = "404", description = "Project or user-project not found"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: Authentication required")
+    })
+    public ResponseEntity<?> deleteAdminProject(@PathVariable Integer projectId) {
+        try {
+            projectService.deleteProjectAdmin(projectId);
+            return ResponseEntity.noContent().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Unexpected error: " + e.getMessage());

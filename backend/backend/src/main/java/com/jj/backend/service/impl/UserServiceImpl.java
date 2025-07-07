@@ -5,12 +5,15 @@ import com.jj.backend.dto.*;
 import com.jj.backend.entity.Role;
 import com.jj.backend.entity.StandardUser;
 import com.jj.backend.entity.UserEntity;
+import com.jj.backend.entity.UserProject;
 import com.jj.backend.repository.RoleRepository;
 import com.jj.backend.repository.StandardUserRepository;
 import com.jj.backend.repository.UserEntityRepository;
 import com.jj.backend.repository.UserProjectRepository;
+import com.jj.backend.service.service.ProjectService;
 import com.jj.backend.service.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,20 +35,31 @@ public class UserServiceImpl implements UserService {
     private final UserEntityRepository userEntityRepository;
     private final StandardUserRepository standardUserRepository;
     private final UserProjectRepository userProjectRepository;
+    @Lazy
+    private final ProjectService projectService;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserEntityRepository userEntityRepository, StandardUserRepository standardUserRepository, UserProjectRepository userProjectRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserEntityRepository userEntityRepository, StandardUserRepository standardUserRepository, UserProjectRepository userProjectRepository,@Lazy ProjectService projectService, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userEntityRepository = userEntityRepository;
         this.standardUserRepository = standardUserRepository;
         this.userProjectRepository = userProjectRepository;
+        this.projectService = projectService;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public List<UserEntity> getAllUsers() {
-        return userEntityRepository.findAll();
+    public List<StandardUser> getAllStandardUsers() {
+        return standardUserRepository.findAll();
+    }
+
+
+    @Override
+    public List<StandardUserFullResponseDto> mapToFullUserDtos(List<StandardUser> users) {
+        return users.stream()
+                .map(this::toStandardUserFullDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -182,6 +196,25 @@ public class UserServiceImpl implements UserService {
         LoginResponseDto dto = new LoginResponseDto();
         fillCommonUserFields(dto, user, token, roles);
         return dto;
+    }
+
+    private StandardUserFullResponseDto toStandardUserFullDto(StandardUser user) {
+        List<ProjectResponseDto> projectDtos = user.getProjects().stream()
+                .map(UserProject::getProject)
+                .distinct()
+                .map(projectService::toProjectResponseDto)
+                .collect(Collectors.toList());
+
+        return new StandardUserFullResponseDto(
+                user.getId(),
+                user.getEmail(),
+                user.getName(),
+                user.getSurname(),
+                user.getPhoneNumber(),
+                user.getWorkRole(),
+                user.getBio(),
+                projectDtos
+        );
     }
 
     private StandardUserLoginResponseDto buildUserResponse(UserEntity user, String token, List<RoleName> roles) {

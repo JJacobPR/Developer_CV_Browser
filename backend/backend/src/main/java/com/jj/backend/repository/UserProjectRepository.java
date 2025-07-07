@@ -23,13 +23,12 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Intege
     WHERE up.standardUser.id = :userId
 """)
     List<Technology> findTechnologiesByUserId(@Param("userId") int userId);
-
     @Modifying
     @Transactional
     @Query("DELETE FROM UserProject up WHERE up.standardUser.id = :userId")
     void deleteByStandardUserId(@Param("userId") int userId);
-
     Optional<UserProject> findByStandardUserAndProject(StandardUser user, Project project);
-
     int countByProject(Project project);
+    Optional<UserProject> findByProjectIdAndStandardUserIdAndProjectRole(Integer projectId, Integer userId, String projectRole);
+    boolean existsByProjectIdAndStandardUserIdAndProjectRole(Integer projectId, Integer userId, String projectRole);
 }
