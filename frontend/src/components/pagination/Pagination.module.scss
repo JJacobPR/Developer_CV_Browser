@@ -1,0 +1,18 @@
+@use "@partials" as p;
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: center;
+  margin-top: auto;
+  margin-bottom: 1rem;
+
+  button {
+    @include p.button;
+
+    &.active {
+      background-color: darken(p.$primary, 20%);
+    }
+  }
+}

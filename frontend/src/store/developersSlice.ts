@@ -44,7 +44,6 @@ const developerSlice = createSlice({
       .addCase(fetchDevelopers.fulfilled, (state, action: PayloadAction<StandardUserWithProjects[]>) => {
         state.status = "SUCCESS";
         state.developers = action.payload;
-        console.log("Fetched developers:", action.payload);
       })
       .addCase(fetchDevelopers.rejected, (state, action) => {
         state.status = "ERROR";

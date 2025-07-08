@@ -1,0 +1,54 @@
+@use "@partials" as p;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: p.$text;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  input {
+    @include p.input;
+  }
+
+  textarea {
+    @include p.textarea;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.submit {
+  @include p.button;
+}
+
+.dateRow {
+  display: flex;
+  gap: 1rem;
+}
+
+.techPicker {
+  display: flex;
+  flex-direction: column;
+}
+
+.techList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.techItem {
+  background: #f0f0f0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}

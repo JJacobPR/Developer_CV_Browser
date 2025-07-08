@@ -43,8 +43,8 @@
 
 @mixin textarea {
   @include input-like;
-  resize: vertical;
-  min-height: 120px;
+  resize: none;
+  height: 100px;
 }
 
 @mixin heading($size, $weight: 700, $margin: 0 0 0.5rem 0) {

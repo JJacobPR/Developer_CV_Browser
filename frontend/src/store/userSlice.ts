@@ -37,7 +37,6 @@ export const loginUser = createAsyncThunk<LoginResponse | StandardUserLoginRespo
     }
 
     const data: any = await response.json();
-    console.log("Login response data:", data);
 
     return data;
   } catch (error) {

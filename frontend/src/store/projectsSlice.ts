@@ -30,7 +30,7 @@ export const fetchProjects = createAsyncThunk<Project[], void, { rejectValue: st
     }
 
     const data: Project[] = await response.json();
-    console.log(data);
+
     return data;
   } catch (error) {
     return thunkAPI.rejectWithValue("Failed to fetch projects");

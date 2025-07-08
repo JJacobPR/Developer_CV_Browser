@@ -1,18 +1,15 @@
-import { useAppDispatch, useAppSelector } from "@hooks/redux";
-import Spinner from "../../../ui/Spinner/Spinner";
+import Spinner from "../../../ui/spinner/Spinner";
 import styles from "./ProjectList.module.scss";
-import { useEffect } from "react";
-import { fetchProjects } from "@store/projectsSlice";
 import ProjectCard from "../projectCard/ProjectCard";
+import type { Project } from "models/Project";
+import type { Status } from "models/Utils";
 
-const ProjectList = () => {
-  const dispatch = useAppDispatch();
-  const { projects, status } = useAppSelector((state) => state.projectSlice);
+type ProjectListProps = {
+  projects: Project[];
+  status: Status;
+};
 
-  useEffect(() => {
-    if (status === "IDLE") dispatch(fetchProjects());
-  }, [status, dispatch]);
-
+const ProjectList = ({ projects, status }: ProjectListProps) => {
   return (
     <>
       {status === "LOADING" && <Spinner size={40} />}

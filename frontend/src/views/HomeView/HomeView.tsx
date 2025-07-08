@@ -4,8 +4,6 @@ import Header from "@components/header/Header";
 import { Outlet, useNavigate } from "react-router";
 import { useState } from "react";
 import TabMenu from "@components/tabMenu/TabMenu";
-import { useAppDispatch } from "@hooks/redux";
-import { fetchDevelopers } from "@store/developersSlice";
 
 const userTabs = [
   { label: "Developers", value: "devs" },
@@ -15,8 +13,6 @@ const userTabs = [
 const HomeView = () => {
   const [activeTab, setActiveTab] = useState("devs");
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  dispatch(fetchDevelopers());
 
   const changeTab = (tab: string) => {
     setActiveTab(tab);
