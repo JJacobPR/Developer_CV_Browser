@@ -1,0 +1,16 @@
+@use "@partials" as p;
+
+.user-list-header {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+
+  select,
+  input {
+    @include p.input;
+  }
+
+  input {
+    width: 33%;
+  }
+}

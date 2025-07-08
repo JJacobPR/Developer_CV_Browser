@@ -2,16 +2,17 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { API_URL } from "../config";
 import type { Project } from "models/Project";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import type { Status } from "models/Utils";
 
 interface ProjectsState {
   projects: Project[];
-  loading: boolean;
+  status: Status;
   error: string | null;
 }
 
 const initialState: ProjectsState = {
   projects: [],
-  loading: false,
+  status: "IDLE",
   error: null,
 };
 
@@ -39,30 +40,23 @@ export const fetchProjects = createAsyncThunk<Project[], void, { rejectValue: st
 const projectsSlice = createSlice({
   name: "projects",
   initialState,
-  reducers: {
-    clearProjects(state) {
-      state.projects = [];
-      state.error = null;
-      state.loading = false;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchProjects.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.status = "LOADING";
       })
       .addCase(fetchProjects.fulfilled, (state, action: PayloadAction<Project[]>) => {
-        state.loading = false;
+        state.status = "SUCCESS";
         state.projects = action.payload;
       })
       .addCase(fetchProjects.rejected, (state, action) => {
-        state.loading = false;
+        state.status = "ERROR";
         state.error = action.payload || "Unknown error";
       });
   },
 });
 
-export const { clearProjects } = projectsSlice.actions;
+export const {} = projectsSlice.actions;
 
 export default projectsSlice.reducer;

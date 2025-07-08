@@ -1,0 +1,28 @@
+@use "@partials" as p;
+
+.user-bio {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  color: p.$text;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.role {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.bio {
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}

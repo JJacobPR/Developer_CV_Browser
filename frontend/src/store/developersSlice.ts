@@ -2,16 +2,17 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { API_URL } from "../config";
 import type { StandardUserWithProjects } from "models/User";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import type { Status } from "models/Utils";
 
 interface DeveloperState {
   developers: StandardUserWithProjects[];
-  loading: boolean;
+  status: Status;
   error: string | null;
 }
 
 const initialState: DeveloperState = {
   developers: [],
-  loading: false,
+  status: "IDLE",
   error: null,
 };
 
@@ -37,16 +38,16 @@ const developerSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchDevelopers.pending, (state) => {
-        state.loading = true;
+        state.status = "LOADING";
         state.error = null;
       })
       .addCase(fetchDevelopers.fulfilled, (state, action: PayloadAction<StandardUserWithProjects[]>) => {
-        state.loading = false;
+        state.status = "SUCCESS";
         state.developers = action.payload;
         console.log("Fetched developers:", action.payload);
       })
       .addCase(fetchDevelopers.rejected, (state, action) => {
-        state.loading = false;
+        state.status = "ERROR";
         state.error = action.payload || "Unknown error";
       });
   },

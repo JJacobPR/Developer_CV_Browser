@@ -1,0 +1,44 @@
+@use "@partials" as p;
+
+.container {
+  padding: 2rem;
+  background-color: white;
+  color: p.$text;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  h2 {
+    @include p.heading(h2);
+    color: p.$primary;
+    margin: 0;
+  }
+}
+
+.description {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.period {
+  @include p.paragraph;
+}
+
+.technologies {
+  h4 {
+    @include p.heading(h4);
+    margin-top: 1rem;
+  }
+
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}

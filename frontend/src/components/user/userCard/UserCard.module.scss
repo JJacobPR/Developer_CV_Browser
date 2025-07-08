@@ -1,0 +1,38 @@
+@use "@partials" as p;
+
+.developer-list-item {
+  background-color: white;
+  color: p.$text;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+  .header {
+    h3 {
+      @include p.heading(h3);
+    }
+  }
+
+  .technologies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .tech-pill {
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background-color: #e0e0e0;
+    color: #333;
+  }
+
+  .bio {
+    margin: 0;
+    color: #555;
+    font-size: 0.95rem;
+  }
+}

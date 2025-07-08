@@ -1,0 +1,26 @@
+.badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: white;
+  margin: 0.25rem;
+  text-transform: capitalize;
+}
+
+.backend {
+  background-color: #3498db;
+}
+
+.frontend {
+  background-color: #e67e22;
+}
+
+.devops {
+  background-color: #27ae60;
+}
+
+.database {
+  background-color: #8e44ad;
+}

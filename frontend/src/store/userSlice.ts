@@ -3,18 +3,19 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { StandardUser, User } from "models/User";
 import { API_URL } from "../config";
 import type { LoginRequest, LoginResponse, StandardUserLoginResponse } from "models/Auth";
+import type { Status } from "models/Utils";
 
 type UserState = {
   user: StandardUser | User | null;
   token: string | null;
-  loading: boolean;
+  status: Status;
   error: string | null;
 };
 
 const initialState: UserState = {
   user: null,
   token: localStorage.getItem("token") || null,
-  loading: false,
+  status: "IDLE",
   error: null,
 };
 
@@ -56,11 +57,11 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
-        state.loading = true;
+        state.status = "LOADING";
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action: PayloadAction<LoginResponse | StandardUserLoginResponse>) => {
-        state.loading = false;
+        state.status = "SUCCESS";
         state.token = action.payload.token;
 
         if (isStandardUserLoginResponse(action.payload))
@@ -84,7 +85,7 @@ const userSlice = createSlice({
         localStorage.setItem("token", action.payload.token);
       })
       .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
+        state.status = "ERROR";
         state.error = action.payload || "Unknown error";
       });
   },

@@ -12,3 +12,9 @@ export type TechnologyResponse = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type Technology = {
+  id: number;
+  name: string;
+  type: TechnologyType;
+};
