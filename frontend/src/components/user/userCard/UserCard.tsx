@@ -16,7 +16,7 @@ const UserCard = ({ id, name, surname, technologies, bio }: Props) => {
 
   const navigateToDetailed = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    navigate(`/devs/${id}`);
+    navigate(`/users/${id}`);
   };
 
   return (

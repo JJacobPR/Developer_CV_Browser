@@ -6,6 +6,7 @@ import HomeView from "@views/homeView/HomeView";
 import LoginView from "@views/loginView/LoginView";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import ProtectedRoute from "./ProtectedRoute";
+import Authorized from "./AuthorizedRoute";
 
 const router = createBrowserRouter([
   {
@@ -18,23 +19,23 @@ const router = createBrowserRouter([
         children: [
           {
             path: "my-projects",
-            element: <Projects />,
+            element: <Authorized child={<Projects />} role={"USER"} />,
           },
           {
             path: "my-projects/add-project",
             element: <ProjectForm />,
           },
           {
-            path: "devs",
+            path: "",
             element: <UserList />,
           },
           {
-            path: "devs/:userId",
+            path: "users/:userId",
             element: <Projects />,
           },
           {
             path: "admin/add-user",
-            element: <UserForm />,
+            element: <Authorized child={<UserForm />} role={"ADMIN"} />,
           },
         ],
       },

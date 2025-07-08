@@ -1,6 +1,4 @@
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@hooks/redux";
-import { loginUser } from "@store/userSlice";
+import { useAppSelector } from "@hooks/redux";
 import { useParams } from "react-router";
 import ContentWrapper from "../../../ui/contentWrapper/ContentWrapper";
 import UserBio from "@components/user/userBio/UserBio";
@@ -9,11 +7,11 @@ import type { StandardUserWithProjects } from "models/User";
 
 const Projects = () => {
   const { userId } = useParams();
-  const { user, status } = useAppSelector((state) => state.userSlice);
-  const { developers } = useAppSelector((state) => state.developerSlice);
+  const { users, status } = useAppSelector((state) => state.usersSlice);
+  const id = useAppSelector((state) => state.loggedUserSlice.loggedUser?.id);
 
   // If there's a userId param, find that user in developers
-  const resolvedUser = (userId ? developers.find((dev) => dev.id === Number(userId)) : developers.find((dev) => dev.id === Number(user?.id))) as StandardUserWithProjects | null;
+  const resolvedUser = users.find((user) => user.id === Number(userId) || user.id === id) as StandardUserWithProjects | null;
 
   if (!resolvedUser) return null;
 
