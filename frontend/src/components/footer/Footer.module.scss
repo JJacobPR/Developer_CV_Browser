@@ -1,0 +1,15 @@
+@use "@partials" as p;
+
+.app-footer {
+  width: 100%;
+  background-color: p.$primary;
+  padding: 1rem;
+  text-align: center;
+  color: p.$text;
+
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    font-size: 0.95rem;
+  }
+}
