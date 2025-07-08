@@ -24,7 +24,11 @@ public interface UserService {
     // Read / Find
     Optional<UserEntity> getUserByEmail(String email);
     StandardUser findById(Integer userId);
+
     StandardUser findByEmail(String email);
+
+    StandardUserFullResponseDto getDtoByEmail(String email);
+
     PagingResult<StandardUser> findAll(PaginationRequest request);
     List<RoleName> getRolesByEmail(String email);
 

@@ -20,11 +20,6 @@ const initialState: UserState = {
 };
 
 export const loginUser = createAsyncThunk<LoginResponse | StandardUserLoginResponse, LoginRequest, { rejectValue: string }>("auth/loginUser", async (credentials, thunkAPI) => {
-  credentials = {
-    email: "alice@example.com",
-    password: "defaultUserPass",
-  };
-
   try {
     const response = await fetch(`${API_URL}/auth/login`, {
       method: "POST",

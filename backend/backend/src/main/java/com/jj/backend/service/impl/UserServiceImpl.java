@@ -139,6 +139,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public StandardUserFullResponseDto getDtoByEmail(String email) {
+        return toStandardUserFullDto(standardUserRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found")));
+    }
+
+    @Override
     public PagingResult<StandardUser> findAll(PaginationRequest request) {
         Pageable pageable = PaginationUtils.getPageable(request.getPage(), request.getSize(), request.getDirection(), request.getSortField());
         Page<StandardUser> users = standardUserRepository.findAll(pageable);

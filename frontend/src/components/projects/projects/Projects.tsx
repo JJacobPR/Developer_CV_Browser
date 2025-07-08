@@ -9,21 +9,8 @@ import type { StandardUserWithProjects } from "models/User";
 
 const Projects = () => {
   const { userId } = useParams();
-  const dispatch = useAppDispatch();
-
   const { user, status } = useAppSelector((state) => state.userSlice);
   const { developers } = useAppSelector((state) => state.developerSlice);
-
-  useEffect(() => {
-    if (status === "IDLE") {
-      dispatch(
-        loginUser({
-          email: "",
-          password: "",
-        })
-      );
-    }
-  }, [dispatch, status]);
 
   // If there's a userId param, find that user in developers
   const resolvedUser = (userId ? developers.find((dev) => dev.id === Number(userId)) : developers.find((dev) => dev.id === Number(user?.id))) as StandardUserWithProjects | null;

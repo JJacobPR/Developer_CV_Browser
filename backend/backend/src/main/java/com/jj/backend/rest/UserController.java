@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -30,6 +31,22 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/data")
+    @Operation(
+            summary = "Get user by email from token",
+            description = "Returns user by token. Only accessible by ADMIN and USER.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
+            @ApiResponse(responseCode = "500", description = "Unexpected server error")
+    })
+    public ResponseEntity<StandardUserFullResponseDto> getUserBytoken(Principal principal) {
+        String email = principal.getName();
+        return ResponseEntity.ok(userService.getDtoByEmail(email));
+    }
+
+
     @GetMapping
     @Operation(
             summary = "Get all users with their full profile and project information",
@@ -38,6 +55,9 @@ public class UserController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request: User with the given email already exists or invalid input"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid or missing token"),
+            @ApiResponse(responseCode = "403", description = "Forbidden: Invalid role"),
             @ApiResponse(responseCode = "500", description = "Unexpected server error")
     })
     public ResponseEntity<List<StandardUserFullResponseDto>> getAllUsersWithProjects(@RequestParam(defaultValue = "0") int page,

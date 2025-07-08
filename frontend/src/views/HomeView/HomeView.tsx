@@ -2,8 +2,11 @@ import Footer from "@components/footer/Footer";
 import styles from "./HomeView.module.scss";
 import Header from "@components/header/Header";
 import { Outlet, useNavigate } from "react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TabMenu from "@components/tabMenu/TabMenu";
+import { useAppDispatch, useAppSelector } from "@hooks/redux";
+import { fetchDevelopers } from "@store/developersSlice";
+import { fetchProjects } from "@store/projectsSlice";
 
 const userTabs = [
   { label: "Developers", value: "devs" },
@@ -12,7 +15,34 @@ const userTabs = [
 
 const HomeView = () => {
   const [activeTab, setActiveTab] = useState("devs");
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const userStatus = useAppSelector((state) => state.userSlice.status);
+  const devStatus = useAppSelector((state) => state.developerSlice.status);
+  const projectStatus = useAppSelector((state) => state.projectSlice.status);
+
+  // Check if the current path matches any of the user tabs
+  // If not, redirect to the default tab (developers)
+  useEffect(() => {
+    const currentPath = window.location.pathname.split("/")[1];
+    if (userTabs.some((tab) => tab.value === currentPath)) {
+      setActiveTab(currentPath);
+    } else {
+      navigate("/devs");
+    }
+  });
+
+  useEffect(() => {
+    // Fetch developers if not already loaded
+    if (devStatus === "IDLE") {
+      dispatch(fetchDevelopers());
+    }
+    // Fetch projects if not already loaded
+    if (projectStatus === "IDLE") {
+      dispatch(fetchProjects());
+    }
+  }, [userStatus, devStatus, projectStatus]);
 
   const changeTab = (tab: string) => {
     setActiveTab(tab);

@@ -1,9 +1,13 @@
+import { useNavigate } from "react-router";
 import styles from "./Header.module.scss";
 import logo from "@img/logo.png";
 
 const Header = () => {
-  const handleLogout = () => {
-    console.log("Logging out...");
+  const navigate = useNavigate();
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
@@ -14,7 +18,7 @@ const Header = () => {
         </div>
       </div>
       <div className={styles["header-right"]}>
-        <button className={styles["logout-button"]} onClick={handleLogout}>
+        <button className={styles["logout-button"]} onClick={logout}>
           Logout
         </button>
       </div>
