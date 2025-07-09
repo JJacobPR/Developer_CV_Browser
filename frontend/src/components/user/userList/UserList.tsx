@@ -1,18 +1,17 @@
-import { useAppDispatch, useAppSelector } from "@hooks/redux";
+import { useAppSelector } from "@hooks/redux";
 import styles from "./UserList.module.scss";
 import UserCard from "../userCard/UserCard";
-import { useEffect, useState, useMemo } from "react";
-import { fetchUsers } from "@store/usersSlice";
+import { useState, useMemo } from "react";
 import UserListHeader from "../userListHeader/UserListHeader";
-import type { StandardUserWithProjects } from "models/User";
-import type { Technology } from "models/Technology";
-import type { Project } from "models/Project";
+import type { StandardUserWithProjects } from "models/user";
+import type { Technology } from "models/technology";
+import type { Project } from "models/project";
 import Pagination from "@components/pagination/Pagination";
 import usePagination from "@hooks/usePagination";
 import Spinner from "../../../ui/spinner/Spinner";
 
 const UserList = () => {
-  const { users, status } = useAppSelector((state) => state.usersSlice);
+  const { users, status } = useAppSelector((state) => state.userSlice);
 
   const [filters, setFilters] = useState({
     technology: "",

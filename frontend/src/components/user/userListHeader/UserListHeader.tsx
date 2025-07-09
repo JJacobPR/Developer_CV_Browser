@@ -1,7 +1,7 @@
 import styles from "./UserListHeader.module.scss";
 import { useState, useEffect } from "react";
 import { API_URL } from "../../../config";
-import type { Technology } from "models/Technology";
+import type { Technology } from "models/technology";
 
 type Props = {
   onFilterChange: (filters: { technology: string; projectRole: string; projectName: string }) => void;

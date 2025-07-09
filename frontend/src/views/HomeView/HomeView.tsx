@@ -5,18 +5,18 @@ import { Outlet, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import TabMenu from "@components/tabMenu/TabMenu";
 import { useAppDispatch, useAppSelector } from "@hooks/redux";
-import { fetchUsers } from "@store/usersSlice";
-import { refreshUser } from "@store/loggedUserSlice";
+import { fetchUsers } from "@store/userSlice";
+import { refreshUser } from "@store/authSlice";
 import useTabs from "@hooks/useTabs";
-import type { User } from "models/User";
+import type { User } from "models/user";
 import Spinner from "../../ui/spinner/Spinner";
 
 const HomeView = () => {
   const [activeTab, setActiveTab] = useState("");
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { status: userStatus, loggedUser } = useAppSelector((state) => state.loggedUserSlice);
-  const usersStatus = useAppSelector((state) => state.usersSlice.status);
+  const { status: userStatus, loggedUser } = useAppSelector((state) => state.authSlice);
+  const usersStatus = useAppSelector((state) => state.userSlice.status);
 
   // Check if the user is logged in
   useEffect(() => {

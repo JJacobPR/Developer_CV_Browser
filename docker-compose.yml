@@ -6,7 +6,7 @@ services:
       context: ./frontend
     container_name: react-frontend
     ports:
-      - "3000:80"
+      - "5173:5173"
     depends_on:
       - backend
 

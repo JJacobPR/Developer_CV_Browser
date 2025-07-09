@@ -1,14 +1,14 @@
 import TechnologyBadge from "@components/technologyBadge/TechnologyBadge";
 import styles from "./UserCard.module.scss";
-import type { Technology } from "models/Technology";
+import type { Technology } from "models/technology";
 import { useNavigate } from "react-router";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useState } from "react";
 import type { MouseEvent } from "react";
 import Modal from "../../../ui/modal/Modal";
-import { hasPermission, type Role } from "../../../router/Auth";
+import { hasPermission, type Role } from "../../../router/auth";
 import { useAppDispatch, useAppSelector } from "@hooks/redux";
-import { deleteUser } from "@store/usersSlice";
+import { deleteUser } from "@store/userSlice";
 
 type Props = {
   id: number;
@@ -22,7 +22,7 @@ const UserCard = ({ id, name, surname, technologies, bio }: Props) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState(false);
-  const loggedUser = useAppSelector((state) => state.loggedUserSlice.loggedUser);
+  const loggedUser = useAppSelector((state) => state.authSlice.loggedUser);
 
   const navigateToDetailed = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -45,7 +45,7 @@ const UserCard = ({ id, name, surname, technologies, bio }: Props) => {
 
   return (
     <>
-      <div onClick={(e) => navigateToDetailed(e)} className={styles["developer-list-item"]}>
+      <div onClick={(e) => navigateToDetailed(e)} className={styles["user-list-item"]}>
         <div className={styles["actions"]}>
           {hasPermission({ roles: [loggedUser?.role] as Role[], id: loggedUser?.id as number }, "update:users") && <MdEdit onClick={(e) => navigateModifyUser(e)} className={styles["icon"]} />}
           {hasPermission({ roles: [loggedUser?.role] as Role[], id: loggedUser?.id as number }, "delete:users") && <MdDelete onClick={(e) => openDeleteModal(e)} className={styles["icon"]} />}

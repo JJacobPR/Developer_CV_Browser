@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import styles from "./LoginPage.module.scss";
-import { loginUser } from "@store/loggedUserSlice";
-import type { LoginRequest } from "models/Auth";
+import { loginUser } from "@store/authSlice";
+import type { LoginRequest } from "models/auth";
 import { useAppDispatch, useAppSelector } from "@hooks/redux";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
@@ -14,7 +14,7 @@ type LoginForm = {
 const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { error, status } = useAppSelector((state) => state.loggedUserSlice);
+  const { error, status } = useAppSelector((state) => state.authSlice);
 
   const {
     register,

@@ -1,8 +1,8 @@
 import Spinner from "../../../ui/spinner/Spinner";
 import styles from "./ProjectList.module.scss";
 import ProjectCard from "../projectCard/ProjectCard";
-import type { Project } from "models/Project";
-import type { Status } from "models/Utils";
+import type { Project } from "models/project";
+import type { Status } from "models/utils";
 
 type ProjectListProps = {
   projects: Project[];

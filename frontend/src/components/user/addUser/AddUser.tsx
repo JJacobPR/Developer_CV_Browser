@@ -1,7 +1,7 @@
 import { useAppDispatch } from "@hooks/redux";
 import UserForm from "../userForm/UserForm";
-import type { StandardUserRequest } from "models/User";
-import { addUser as addUserSlice } from "@store/usersSlice";
+import type { StandardUserRequest } from "models/user";
+import { addUser as addUserSlice } from "@store/userSlice";
 
 const AddUser = () => {
   const dispatch = useAppDispatch();

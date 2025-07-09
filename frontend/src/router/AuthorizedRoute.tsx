@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from "@hooks/redux";
-import { refreshUser } from "@store/loggedUserSlice";
+import { refreshUser } from "@store/authSlice";
 import React, { useEffect } from "react";
 import { Navigate } from "react-router";
 import Spinner from "../ui/spinner/Spinner";
@@ -13,7 +13,7 @@ const Authorized = ({ child, role }: Props) => {
   const token = localStorage.getItem("token");
   const fallback = <Navigate to="/" replace />;
   const dispatch = useAppDispatch();
-  const { status, loggedUser } = useAppSelector((state) => state.loggedUserSlice);
+  const { status, loggedUser } = useAppSelector((state) => state.authSlice);
 
   useEffect(() => {
     if (status === "IDLE") {

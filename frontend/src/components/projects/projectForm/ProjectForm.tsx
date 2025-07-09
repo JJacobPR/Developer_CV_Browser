@@ -1,7 +1,7 @@
 import { FormProvider, useForm } from "react-hook-form";
 import styles from "./ProjectForm.module.scss";
 import { useEffect, useState, type FormEvent } from "react";
-import type { ProjectRequest } from "models/Project";
+import type { ProjectRequest } from "models/project";
 import Modal from "../../../ui/modal/Modal";
 import TechnologySelect from "./technologySelect/TechnologySelect";
 import { useNavigate } from "react-router";
@@ -18,7 +18,7 @@ type ProjectFormProps = {
 const ProjectForm = ({ modalTitle, modalConfirmText, onSubmit, initialData, modalCancelText = "Cancel" }: ProjectFormProps) => {
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
-  const userId = useAppSelector((state) => state.loggedUserSlice.loggedUser?.id);
+  const userId = useAppSelector((state) => state.authSlice.loggedUser?.id);
   const methods = useForm<ProjectRequest>({
     defaultValues: {
       userId: userId,

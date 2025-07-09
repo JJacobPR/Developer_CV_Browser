@@ -8,6 +8,8 @@ const ROLES = {
   USER: ["delete:projects", "create:projects", "update:projects", "view:own-projects"] as const,
 } as const;
 
+// This function checks if a user has a specific permission based on their roles.
+// It iterates through the user's roles and checks if any of the roles include the specified permission
 export const hasPermission = (user: UserAuth, permission: Permission) => {
   return user.roles.some((role) => (ROLES[role] as readonly Permission[]).includes(permission));
 };

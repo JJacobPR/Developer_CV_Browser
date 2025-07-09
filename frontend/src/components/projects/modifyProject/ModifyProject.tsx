@@ -1,14 +1,14 @@
-import type { ProjectRequest } from "models/Project";
+import type { ProjectRequest } from "models/project";
 import ProjectForm from "../projectForm/ProjectForm";
 import { useAppDispatch, useAppSelector } from "@hooks/redux";
-import { modifyUserProject } from "@store/usersSlice";
+import { modifyUserProject } from "@store/userSlice";
 import { useParams } from "react-router";
 
 const ModifyProject = () => {
   const dispatch = useAppDispatch();
   const { projectId } = useParams();
-  const { users } = useAppSelector((state) => state.usersSlice);
-  const { loggedUser } = useAppSelector((state) => state.loggedUserSlice);
+  const { users } = useAppSelector((state) => state.userSlice);
+  const { loggedUser } = useAppSelector((state) => state.authSlice);
   const currentUser = users.find((user) => user.id === loggedUser?.id);
   const project = currentUser?.projects.find((project) => project.projectId === Number(projectId));
 

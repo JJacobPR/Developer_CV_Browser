@@ -1,7 +1,7 @@
-import type { ProjectRequest } from "models/Project";
+import type { ProjectRequest } from "models/project";
 import ProjectForm from "../projectForm/ProjectForm";
 import { useAppDispatch } from "@hooks/redux";
-import { addProjectToUser } from "@store/usersSlice";
+import { addProjectToUser } from "@store/userSlice";
 
 const AddProject = () => {
   const dispatch = useAppDispatch();

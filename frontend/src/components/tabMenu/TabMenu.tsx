@@ -1,4 +1,4 @@
-import type { TabMenuProps } from "models/Tab";
+import type { TabMenuProps } from "models/tab";
 import styles from "./TabMenu.module.scss";
 
 const TabMenu = ({ tabs, activeTab, onTabChange, className = "" }: TabMenuProps) => {

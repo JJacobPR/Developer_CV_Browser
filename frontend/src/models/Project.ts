@@ -1,5 +1,5 @@
-import type { TechnologyResponse } from "./Technology";
-import type { StandardUserProjectResponse } from "./User";
+import type { TechnologyResponse } from "./technology";
+import type { StandardUserProjectResponse } from "./user";
 
 export type ProjectRequest = {
   userId: number;

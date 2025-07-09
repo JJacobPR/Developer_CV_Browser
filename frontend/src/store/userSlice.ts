@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { API_URL } from "../config";
-import type { StandardUserRequest, StandardUserWithProjects } from "models/User";
+import type { StandardUserRequest, StandardUserWithProjects } from "models/user";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { Status } from "models/Utils";
-import type { ProjectRequest } from "models/Project";
+import type { Status } from "models/utils";
+import type { ProjectRequest } from "models/project";
 
 interface UsersState {
   users: StandardUserWithProjects[];
@@ -166,7 +166,7 @@ export const deleteUserProject = createAsyncThunk<string, number, { rejectValue:
   }
 });
 
-const usersSlice = createSlice({
+const userSlice = createSlice({
   name: "developers",
   initialState,
   reducers: {},
@@ -266,6 +266,6 @@ const usersSlice = createSlice({
   },
 });
 
-export const {} = usersSlice.actions;
+export const {} = userSlice.actions;
 
-export default usersSlice.reducer;
+export default userSlice.reducer;

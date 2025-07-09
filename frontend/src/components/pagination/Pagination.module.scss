@@ -1,4 +1,5 @@
 @use "@partials" as p;
+@use "sass:color";
 
 .pagination {
   display: flex;
@@ -12,7 +13,7 @@
     @include p.button;
 
     &.active {
-      background-color: darken(p.$primary, 20%);
+      background-color: color.adjust(p.$primary, $lightness: -20%);
     }
   }
 }

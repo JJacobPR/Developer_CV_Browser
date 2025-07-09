@@ -1,4 +1,4 @@
-import type { Project } from "./Project";
+import type { Project } from "./project";
 
 export interface User {
   id: number;

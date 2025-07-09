@@ -1,9 +1,9 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import type { StandardUser, User } from "models/User";
+import type { StandardUser, User } from "models/user";
 import { API_URL } from "../config";
-import type { LoginRequest, LoginResponse, StandardUserLoginResponse } from "models/Auth";
-import type { Status } from "models/Utils";
+import type { LoginRequest, LoginResponse, StandardUserLoginResponse } from "models/auth";
+import type { Status } from "models/utils";
 
 type LoggedUserState = {
   loggedUser: StandardUser | User | null;
@@ -60,7 +60,7 @@ export const refreshUser = createAsyncThunk<LoginResponse | StandardUserLoginRes
   }
 });
 
-const loggedUserSlice = createSlice({
+const authSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
@@ -141,9 +141,9 @@ const loggedUserSlice = createSlice({
   },
 });
 
-export const { logout } = loggedUserSlice.actions;
+export const { logout } = authSlice.actions;
 
-export default loggedUserSlice.reducer;
+export default authSlice.reducer;
 
 const isStandardUserLoginResponse = (payload: LoginResponse | StandardUserLoginResponse): payload is StandardUserLoginResponse => {
   return payload.role === "USER";

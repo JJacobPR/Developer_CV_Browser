@@ -23,6 +23,14 @@ const router = createBrowserRouter([
         element: <HomeView />,
         children: [
           {
+            path: "",
+            element: <UserList />,
+          },
+          {
+            path: "users/:userId",
+            element: <Projects />,
+          },
+          {
             path: "my-projects",
             element: <Authorized child={<Projects />} role={"USER"} />,
           },
@@ -33,14 +41,6 @@ const router = createBrowserRouter([
           {
             path: "my-projects/modify-project/:projectId",
             element: <Authorized child={<ModifyProject />} role={"USER"} />,
-          },
-          {
-            path: "",
-            element: <UserList />,
-          },
-          {
-            path: "users/:userId",
-            element: <Projects />,
           },
           {
             path: "admin/add-user",

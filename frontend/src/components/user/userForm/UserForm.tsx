@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import styles from "./UserForm.module.scss";
 import { useState, type FormEvent } from "react";
 import Modal from "../../../ui/modal/Modal";
-import type { StandardUserRequest } from "models/User";
+import type { StandardUserRequest } from "models/user";
 import { useNavigate } from "react-router";
 
 type AddUserFormProps = {

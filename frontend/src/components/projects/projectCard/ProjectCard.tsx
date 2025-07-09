@@ -1,4 +1,4 @@
-import type { Project } from "models/Project";
+import type { Project } from "models/project";
 import styles from "./ProjectCard.module.scss";
 import TechnologyBadge from "@components/technologyBadge/TechnologyBadge";
 import { MdDelete } from "react-icons/md";
@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 import { useState, type MouseEvent } from "react";
 import Modal from "../../../ui/modal/Modal";
 import { useAppDispatch } from "@hooks/redux";
-import { deleteUserProject } from "@store/usersSlice";
+import { deleteUserProject } from "@store/userSlice";
 
 interface ProjectProps {
   project: Project;

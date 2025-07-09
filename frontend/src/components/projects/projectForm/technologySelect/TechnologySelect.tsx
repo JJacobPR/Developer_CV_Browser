@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../../../../config";
 import styles from "./TechnologySelect.module.scss";
-import type { Technology } from "models/Technology";
+import type { Technology } from "models/technology";
 import { useFormContext, useWatch } from "react-hook-form";
 import TechnologyBadge from "@components/technologyBadge/TechnologyBadge";
 
