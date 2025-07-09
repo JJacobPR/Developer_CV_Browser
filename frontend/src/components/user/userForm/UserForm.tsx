@@ -119,7 +119,7 @@ const UserForm = ({ modalTitle, modalConfirmText, onSubmit, initialData, modalCa
           </button>
         </div>
       </form>
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={modalTitle} confirmText={modalConfirmText} cancelText={modalCancelText} onConfirm={submitForm} />;
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={modalTitle} confirmText={modalConfirmText} cancelText={modalCancelText} onConfirm={submitForm} />
     </>
   );
 };

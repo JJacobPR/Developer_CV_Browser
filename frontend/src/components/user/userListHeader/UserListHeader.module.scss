@@ -13,4 +13,13 @@
   input {
     width: 33%;
   }
+
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    input {
+      width: 100%;
+    }
+  }
 }
