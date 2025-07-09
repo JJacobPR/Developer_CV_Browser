@@ -1,26 +1,27 @@
-import { useForm, Controller } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import styles from "./ProjectForm.module.scss";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import type { ProjectRequest } from "models/Project";
-import type { Technology } from "models/Technology";
-import { API_URL } from "../../../config";
+import Modal from "../../../ui/modal/Modal";
+import TechnologySelect from "./technologySelect/TechnologySelect";
+import { useNavigate } from "react-router";
+import { useAppSelector } from "@hooks/redux";
 
 type ProjectFormProps = {
+  modalTitle: string;
+  modalConfirmText: string;
+  onSubmit: (data: ProjectRequest) => Promise<any>;
   initialData?: Partial<ProjectRequest>;
+  modalCancelText?: string;
 };
 
-const ProjectForm = ({ initialData }: ProjectFormProps) => {
-  const [technologies, setTechnologies] = useState<Technology[]>([]);
-  const {
-    register,
-    handleSubmit,
-    control,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<ProjectRequest>({
+const ProjectForm = ({ modalTitle, modalConfirmText, onSubmit, initialData, modalCancelText = "Cancel" }: ProjectFormProps) => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const userId = useAppSelector((state) => state.loggedUserSlice.loggedUser?.id);
+  const methods = useForm<ProjectRequest>({
     defaultValues: {
-      userId: 1,
+      userId: userId,
       name: "",
       companyName: "",
       description: "",
@@ -32,97 +33,109 @@ const ProjectForm = ({ initialData }: ProjectFormProps) => {
     },
   });
 
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
+
+  // Registering the technologies field with validation
   useEffect(() => {
-    const fetchTechnologies = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(`${API_URL}/technology`, {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-        if (!response.ok) {
-          throw new Error("Failed to fetch technologies");
-        }
-        const data = await response.json();
-        setTechnologies(data);
-      } catch (error) {
-        console.error("Error fetching technologies:", error);
-      }
+    register("technologies", {
+      validate: (value) => (Array.isArray(value) && value.length > 0) || "Select at least one technology",
+    });
+  });
+
+  const openModal = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
+    handleSubmit(() => setModalOpen(true))();
+  };
+
+  const submitForm = async () => {
+    const formData = getValues();
+
+    // Fix date format before submission
+    const formattedData = {
+      ...formData,
+      startDate: new Date(formData.startDate).toISOString(),
+      endDate: new Date(formData.endDate).toISOString(),
     };
 
-    fetchTechnologies();
-  }, []);
+    try {
+      await onSubmit(formattedData);
 
-  const selectedTechs = watch("technologies");
-
-  const toggleTechnology = (techId: number) => {
-    const current = new Set(selectedTechs);
-    if (current.has(techId)) {
-      current.delete(techId);
-    } else {
-      current.add(techId);
+      setModalOpen(false);
+      navigate("/my-projects");
+    } catch (err) {
+      console.error("Failed to submit project:", err);
     }
-    setValue("technologies", Array.from(current));
   };
 
   return (
-    <form className={styles["project-form"]}>
-      <div className={styles["form-group"]}>
-        <label>Project Name</label>
-        <input {...register("name", { required: true })} />
-        {errors.name && <span className={styles.error}>Name is required</span>}
-      </div>
+    <>
+      <FormProvider {...methods}>
+        <form onSubmit={openModal} className={styles["project-form"]}>
+          <div className={styles["form-group"]}>
+            <label>Project Name</label>
+            <input {...register("name", { required: true })} />
+            {errors.name && <span className={styles["error"]}>Name is required</span>}
+          </div>
 
-      <div className={styles["form-group"]}>
-        <label>Company Name</label>
-        <input {...register("companyName", { required: true })} />
-        {errors.companyName && <span className={styles.error}>Company is required</span>}
-      </div>
+          <div className={styles["form-group"]}>
+            <label>Company Name</label>
+            <input {...register("companyName", { required: true })} />
+            {errors.companyName && <span className={styles["error"]}>Company is required</span>}
+          </div>
 
-      <div className={styles["form-group"]}>
-        <label>Role</label>
-        <input {...register("projectRole", { required: true })} />
-        {errors.projectRole && <span className={styles.error}>Role is required</span>}
-      </div>
+          <div className={styles["form-group"]}>
+            <label>Role</label>
+            <input {...register("projectRole", { required: true })} />
+            {errors.projectRole && <span className={styles["error"]}>Role is required</span>}
+          </div>
 
-      <div className={styles["form-group"]}>
-        <label>Description</label>
-        <textarea {...register("description", { required: true })} />
-        {errors.description && <span className={styles.error}>Description is required</span>}
-      </div>
+          <div className={styles["form-group"]}>
+            <label>Description</label>
+            <textarea {...register("description", { required: true })} />
+            {errors.description && <span className={styles["error"]}>Description is required</span>}
+          </div>
 
-      <div className={styles["form-group"]}>
-        <label>Start Date</label>
-        <input type="date" {...register("startDate", { required: true })} />
-        {errors.startDate && <span className={styles.error}>Start date is required</span>}
-      </div>
+          <div className={styles["form-group"]}>
+            <label>Start Date</label>
+            <input
+              type="date"
+              {...register("startDate", {
+                required: "Start date is required",
+                //Custom validation to ensure end date is after start date
+                validate: (value) => {
+                  const start = new Date(value);
+                  const end = new Date(getValues("endDate"));
+                  console.log("Start Date:", start, "End Date:", end);
+                  if (isNaN(start.getTime()) || isNaN(end.getTime())) return true;
+                  return end >= start || "End date must be after start date";
+                },
+              })}
+            />
+            {errors.startDate && <span className={styles["error"]}>{errors.startDate.message}</span>}
+          </div>
 
-      <div className={styles["form-group"]}>
-        <label>End Date</label>
-        <input type="date" {...register("endDate", { required: true })} />
-        {errors.endDate && <span className={styles.error}>End date is required</span>}
-      </div>
+          <div className={styles["form-group"]}>
+            <label>End Date</label>
+            <input type="date" {...register("endDate", { required: true })} />
+            {errors.endDate && <span className={styles["error"]}>End date is required</span>}
+          </div>
 
-      <div className={styles["form-group"]}>
-        <label>Technologies</label>
-        <div className={styles.techList}>
-          {technologies.map((tech) => (
-            <label key={tech.id} className={styles.techItem}>
-              <input type="checkbox" checked={selectedTechs.includes(tech.id)} onChange={() => toggleTechnology(tech.id)} />
-              {tech.name}
-            </label>
-          ))}
-        </div>
-        {errors.technologies && <span className={styles.error}>Select at least one tech</span>}
-      </div>
+          <TechnologySelect name="technologies" />
 
-      <div className={styles["form-actions"]}>
-        <button type="submit" className={styles.submit}>
-          Submit
-        </button>
-      </div>
-    </form>
+          <div className={styles["form-actions"]}>
+            <button type="submit" className={styles["submit"]}>
+              Submit
+            </button>
+          </div>
+        </form>
+        <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={modalTitle} confirmText={modalConfirmText} cancelText={modalCancelText} onConfirm={submitForm} />
+      </FormProvider>
+    </>
   );
 };
 

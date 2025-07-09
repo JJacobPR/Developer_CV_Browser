@@ -132,6 +132,7 @@ const loggedUserSlice = createSlice({
           };
 
         localStorage.setItem("token", action.payload.token);
+        state.error = null;
       })
       .addCase(refreshUser.rejected, (state, action) => {
         state.status = "ERROR";

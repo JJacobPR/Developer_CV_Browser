@@ -1,6 +1,7 @@
 @use "@partials" as p;
 
 .container {
+  position: relative;
   padding: 2rem;
   background-color: white;
   color: p.$text;
@@ -41,4 +42,8 @@
     display: flex;
     flex-wrap: wrap;
   }
+}
+
+.actions {
+  @include p.actions;
 }

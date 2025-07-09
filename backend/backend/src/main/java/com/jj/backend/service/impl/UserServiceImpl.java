@@ -83,8 +83,9 @@ public class UserServiceImpl implements UserService {
     public UserEntity updateStandardUser(StandardUserRequestDto dto, Integer userId) {
         StandardUser existingUser = standardUserRepository.findStandardUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found"));
-
-        if (standardUserRepository.existsByEmail(dto.getEmail())) {
+        
+        if (!existingUser.getEmail().equals(dto.getEmail()) &&
+                standardUserRepository.existsByEmail(dto.getEmail())) {
             throw new IllegalArgumentException("User with email " + dto.getEmail() + " already exists.");
         }
 

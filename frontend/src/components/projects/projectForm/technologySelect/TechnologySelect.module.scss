@@ -1,0 +1,31 @@
+@use "@partials" as p;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section {
+  margin-bottom: 1rem;
+
+  h4 {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+}
+
+.techGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.badgeButton {
+  cursor: pointer;
+}
+
+.error {
+  color: p.$error;
+  font-size: 0.8rem;
+}

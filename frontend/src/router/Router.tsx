@@ -1,4 +1,3 @@
-import ProjectForm from "@components/projects/projectForm/ProjectForm";
 import Projects from "@components/projects/projects/Projects";
 import UserForm from "@components/user/userForm/UserForm";
 import UserList from "@components/user/userList/UserList";
@@ -7,11 +6,17 @@ import LoginView from "@views/loginView/LoginView";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import ProtectedRoute from "./ProtectedRoute";
 import Authorized from "./AuthorizedRoute";
+import AddProject from "@components/projects/addProject/AddProject";
+import ModifyProject from "@components/projects/modifyProject/ModifyProject";
+import AddUser from "@components/user/addUser/AddUser";
+import ModifyUser from "@components/user/modifyUser/ModifyUser";
+import ErrorView from "@views/errorView/errorView";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <ProtectedRoute />,
+    errorElement: <ErrorView />,
     children: [
       {
         path: "/",
@@ -23,7 +28,11 @@ const router = createBrowserRouter([
           },
           {
             path: "my-projects/add-project",
-            element: <ProjectForm />,
+            element: <Authorized child={<AddProject />} role={"USER"} />,
+          },
+          {
+            path: "my-projects/modify-project/:projectId",
+            element: <Authorized child={<ModifyProject />} role={"USER"} />,
           },
           {
             path: "",
@@ -35,7 +44,11 @@ const router = createBrowserRouter([
           },
           {
             path: "admin/add-user",
-            element: <Authorized child={<UserForm />} role={"ADMIN"} />,
+            element: <Authorized child={<AddUser />} role={"ADMIN"} />,
+          },
+          {
+            path: "admin/modify-user/:userId",
+            element: <Authorized child={<ModifyUser />} role={"ADMIN"} />,
           },
         ],
       },
@@ -44,6 +57,7 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginView />,
+    errorElement: <ErrorView />,
   },
 ]);
 

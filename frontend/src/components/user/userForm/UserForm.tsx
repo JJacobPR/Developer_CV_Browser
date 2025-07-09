@@ -2,9 +2,15 @@ import { useForm } from "react-hook-form";
 import styles from "./UserForm.module.scss";
 import { useState, type FormEvent } from "react";
 import Modal from "../../../ui/modal/Modal";
+import type { StandardUserRequest } from "models/User";
+import { useNavigate } from "react-router";
 
 type AddUserFormProps = {
+  modalTitle: string;
+  modalConfirmText: string;
+  onSubmit: (data: StandardUserRequest) => Promise<any>;
   initialData?: AddUserFormInputs;
+  modalCancelText?: string;
 };
 
 export type AddUserFormInputs = {
@@ -18,11 +24,14 @@ export type AddUserFormInputs = {
   bio: string;
 };
 
-const UserForm = ({ initialData }: AddUserFormProps) => {
+const UserForm = ({ modalTitle, modalConfirmText, onSubmit, initialData, modalCancelText = "Cancel" }: AddUserFormProps) => {
   const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<AddUserFormInputs>({
     defaultValues: initialData || {
@@ -35,9 +44,22 @@ const UserForm = ({ initialData }: AddUserFormProps) => {
     },
   });
 
-  const openModal = (e: FormEvent<HTMLFormElement>): void => {
+  const openModal = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    setModalOpen(true);
+    handleSubmit(() => setModalOpen(true))();
+  };
+
+  const submitForm = async () => {
+    const { confirmPassword, ...formData } = getValues(); // Exclude confirmPassword
+
+    try {
+      await onSubmit(formData);
+
+      setModalOpen(false);
+      navigate("/");
+    } catch (err) {
+      console.error("Failed to submit project:", err);
+    }
   };
 
   return (
@@ -97,17 +119,7 @@ const UserForm = ({ initialData }: AddUserFormProps) => {
           </button>
         </div>
       </form>
-      <Modal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title="Confirm User Creation"
-        confirmText="Create User"
-        cancelText="Cancel"
-        onConfirm={function (): void {
-          throw new Error("Function not implemented.");
-        }}
-      />
-      ;
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={modalTitle} confirmText={modalConfirmText} cancelText={modalCancelText} onConfirm={submitForm} />;
     </>
   );
 };

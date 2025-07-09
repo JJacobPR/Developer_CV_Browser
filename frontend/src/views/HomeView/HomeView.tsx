@@ -7,28 +7,18 @@ import TabMenu from "@components/tabMenu/TabMenu";
 import { useAppDispatch, useAppSelector } from "@hooks/redux";
 import { fetchUsers } from "@store/usersSlice";
 import { refreshUser } from "@store/loggedUserSlice";
-
-const userTabs = [
-  { label: "Users", value: "" },
-  { label: "My Projects", value: "my-projects" },
-];
+import useTabs from "@hooks/useTabs";
+import type { User } from "models/User";
+import Spinner from "../../ui/spinner/Spinner";
 
 const HomeView = () => {
   const [activeTab, setActiveTab] = useState("");
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
-  const userStatus = useAppSelector((state) => state.loggedUserSlice.status);
+  const { status: userStatus, loggedUser } = useAppSelector((state) => state.loggedUserSlice);
   const usersStatus = useAppSelector((state) => state.usersSlice.status);
 
-  // Check if the current path matches any of the user tabs and set the active tab accordingly
-  useEffect(() => {
-    const currentPath = window.location.pathname.split("/")[1];
-    if (userTabs.some((tab) => tab.value === currentPath)) {
-      setActiveTab(currentPath);
-    }
-  });
-
+  // Check if the user is logged in
   useEffect(() => {
     if (userStatus === "IDLE") {
       dispatch(refreshUser());
@@ -38,6 +28,22 @@ const HomeView = () => {
       dispatch(fetchUsers());
     }
   }, [userStatus, usersStatus]);
+
+  // Check if the current path matches any of the user tabs and set the active tab accordingly
+  useEffect(() => {
+    const currentPath = window.location.pathname.slice(1);
+    if (userTabs.some((tab) => tab.value === currentPath)) {
+      setActiveTab(currentPath);
+    }
+  });
+
+  // Get tabs for the user
+  const userTabs = useTabs(loggedUser as User);
+
+  // Wait for the user to be logged in before rendering the view
+  if (loggedUser === null) {
+    return <Spinner size={40} />;
+  }
 
   const changeTab = (tab: string) => {
     setActiveTab(tab);

@@ -18,7 +18,7 @@ const Projects = () => {
   return (
     <ContentWrapper>
       <UserBio id={resolvedUser.id} email={resolvedUser.email} name={resolvedUser.name} surname={resolvedUser.surname} phoneNumber={resolvedUser.phoneNumber} workRole={resolvedUser.workRole} bio={resolvedUser.bio} />
-      <ProjectList projects={resolvedUser.projects} status={status} />
+      <ProjectList projects={resolvedUser.projects} status={status} isOwner={userId === undefined} />
     </ContentWrapper>
   );
 };
