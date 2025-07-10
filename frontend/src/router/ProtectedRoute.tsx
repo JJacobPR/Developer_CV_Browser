@@ -1,5 +1,4 @@
 import { Navigate, Outlet } from "react-router";
-import { API_URL } from "../config";
 
 const isTokenValid = (): boolean => {
   const token = localStorage.getItem("token");
