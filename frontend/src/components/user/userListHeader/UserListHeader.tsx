@@ -34,7 +34,7 @@ const UserListHeader = ({ onFilterChange }: Props) => {
     };
 
     fetchTechnologies();
-  }, []);
+  });
 
   useEffect(() => {
     onFilterChange({ technology, projectRole, projectName });

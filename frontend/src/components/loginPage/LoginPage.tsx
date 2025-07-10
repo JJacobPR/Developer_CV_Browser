@@ -54,14 +54,14 @@ const LoginPage = () => {
 
         <div className={styles["form-group"]}>
           <label>Password</label>
-          <input {...register("password", { required: true })} type="password" defaultValue="defaultUserPass" />
+          <input {...register("password", { required: true })} type="password" defaultValue="user" />
           {errors.password && <span className={styles.error}>Password is required</span>}
         </div>
 
         <div className={styles["form-actions"]}>
           <button type="submit">Login</button>
         </div>
-        {error && <span className={styles.error}>Wrong Credentials</span>}
+        {error && <span className={styles["error"]}>Wrong Credentials</span>}
       </form>
     </div>
   );

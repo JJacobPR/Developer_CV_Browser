@@ -24,7 +24,7 @@ const Authorized = ({ child, role }: Props) => {
   if (!token) return fallback;
 
   if (status === "IDLE" || status === "LOADING") {
-    return <Spinner size={40} />;
+    return <Spinner size={40} text="Loading Data" />;
   }
 
   const requiredRoles = Array.isArray(role) ? role : [role];

@@ -41,20 +41,23 @@ const UserList = () => {
     return Array.from(new Map(projects.flatMap((project) => project.technologies).map((tech) => [tech.id, tech])).values());
   };
 
-  if (status === "LOADING") return <Spinner size={40} />;
-  if (status === "ERROR") return <p>Failed to load users.</p>;
-  if (status === "SUCCESS" && users.length === 0) return <p>No users found.</p>;
-
   return (
-    <div className={styles["user-list-container"]}>
-      <UserListHeader onFilterChange={handleFilterChange} />
-      <div className={styles["user-list"]}>
-        {paginated.currentItems.map((dev) => (
-          <UserCard key={dev.id} id={dev.id} name={dev.name} surname={dev.surname} bio={dev.bio} technologies={getTechnologiesUser(dev.projects)} />
-        ))}
-      </div>
-      {paginated.maxPage > 1 && <Pagination currentPage={paginated.currentPage} maxPage={paginated.maxPage} onPrev={paginated.prev} onNext={paginated.next} onPageSelect={paginated.jump} />}
-    </div>
+    <>
+      {status === "LOADING" && <Spinner size={40} />}
+      {status === "ERROR" && <p>Failed to load users.</p>}
+      {status === "SUCCESS" && users.length === 0 && <p>No users found.</p>}
+      {status === "SUCCESS" && users.length > 0 && (
+        <div className={styles["user-list-container"]}>
+          <UserListHeader onFilterChange={handleFilterChange} />
+          <div className={styles["user-list"]}>
+            {paginated.currentItems.map((dev) => (
+              <UserCard key={dev.id} id={dev.id} name={dev.name} surname={dev.surname} bio={dev.bio} technologies={getTechnologiesUser(dev.projects)} />
+            ))}
+          </div>
+          {paginated.maxPage > 1 && <Pagination currentPage={paginated.currentPage} maxPage={paginated.maxPage} onPrev={paginated.prev} onNext={paginated.next} onPageSelect={paginated.jump} />}
+        </div>
+      )}
+    </>
   );
 };
 

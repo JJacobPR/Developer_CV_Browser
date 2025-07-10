@@ -27,7 +27,7 @@ export const fetchUsers = createAsyncThunk<StandardUserWithProjects[], void, { r
 
     const data: StandardUserWithProjects[] = await response.json();
     return data;
-  } catch (error) {
+  } catch {
     return thunkAPI.rejectWithValue("Failed to fetch users");
   }
 });
@@ -48,7 +48,7 @@ export const addUser = createAsyncThunk<string, StandardUserRequest, { rejectVal
     }
 
     return "User added successfully";
-  } catch (error) {
+  } catch {
     return thunkAPI.rejectWithValue("Failed to add user");
   }
 });
@@ -67,7 +67,7 @@ export const deleteUser = createAsyncThunk<string, number, { rejectValue: string
     }
 
     return "User deleted successfully";
-  } catch (error) {
+  } catch {
     return thunkAPI.rejectWithValue("Failed to delete user");
   }
 });
@@ -93,7 +93,7 @@ export const modifyUser = createAsyncThunk<string, ModifyUserPayload, { rejectVa
     }
 
     return "User modified successfully";
-  } catch (error) {
+  } catch {
     return thunkAPI.rejectWithValue("Failed to modify user");
   }
 });
@@ -114,7 +114,7 @@ export const addProjectToUser = createAsyncThunk<string, ProjectRequest, { rejec
     }
 
     return "Project added successfully";
-  } catch (error) {
+  } catch {
     return thunkAPI.rejectWithValue("Failed to add project");
   }
 });
@@ -140,7 +140,7 @@ export const modifyUserProject = createAsyncThunk<string, ModifyProjectPayload, 
     }
 
     return "Project modified successfully";
-  } catch (error) {
+  } catch {
     return thunkAPI.rejectWithValue("Failed to modify project");
   }
 });
@@ -160,7 +160,7 @@ export const deleteUserProject = createAsyncThunk<string, number, { rejectValue:
     }
 
     return "Project deleted successfully";
-  } catch (error) {
+  } catch {
     return thunkAPI.rejectWithValue("Failed to delete project");
   }
 });
@@ -189,7 +189,7 @@ const userSlice = createSlice({
         state.status = "LOADING";
         state.error = null;
       })
-      .addCase(addUser.fulfilled, (state, _) => {
+      .addCase(addUser.fulfilled, (state) => {
         state.status = "IDLE";
         state.error = null;
       })
@@ -202,7 +202,7 @@ const userSlice = createSlice({
         state.status = "LOADING";
         state.error = null;
       })
-      .addCase(deleteUser.fulfilled, (state, _) => {
+      .addCase(deleteUser.fulfilled, (state) => {
         state.status = "IDLE";
         state.error = null;
       })
@@ -215,7 +215,7 @@ const userSlice = createSlice({
         state.status = "LOADING";
         state.error = null;
       })
-      .addCase(modifyUser.fulfilled, (state, _) => {
+      .addCase(modifyUser.fulfilled, (state) => {
         state.status = "IDLE";
         state.error = null;
       })
@@ -228,7 +228,7 @@ const userSlice = createSlice({
         state.status = "LOADING";
         state.error = null;
       })
-      .addCase(addProjectToUser.fulfilled, (state, _) => {
+      .addCase(addProjectToUser.fulfilled, (state) => {
         state.status = "IDLE";
         state.error = null;
       })
@@ -241,7 +241,7 @@ const userSlice = createSlice({
         state.status = "LOADING";
         state.error = null;
       })
-      .addCase(modifyUserProject.fulfilled, (state, _) => {
+      .addCase(modifyUserProject.fulfilled, (state) => {
         state.status = "IDLE";
         state.error = null;
       })
@@ -254,7 +254,7 @@ const userSlice = createSlice({
         state.status = "LOADING";
         state.error = null;
       })
-      .addCase(deleteUserProject.fulfilled, (state, _) => {
+      .addCase(deleteUserProject.fulfilled, (state) => {
         state.status = "IDLE";
         state.error = null;
       })
@@ -264,7 +264,5 @@ const userSlice = createSlice({
       });
   },
 });
-
-export const {} = userSlice.actions;
 
 export default userSlice.reducer;

@@ -31,10 +31,10 @@ export const loginUser = createAsyncThunk<LoginResponse | StandardUserLoginRespo
       throw new Error("Login failed");
     }
 
-    const data: any = await response.json();
+    const data = await response.json();
 
     return data;
-  } catch (error) {
+  } catch {
     return thunkAPI.rejectWithValue("Login failed");
   }
 });
@@ -52,10 +52,10 @@ export const refreshUser = createAsyncThunk<LoginResponse | StandardUserLoginRes
       throw new Error("Refresh failed");
     }
 
-    const data: any = await response.json();
+    const data = await response.json();
 
     return data;
-  } catch (error) {
+  } catch {
     return thunkAPI.rejectWithValue("Refresh failed");
   }
 });

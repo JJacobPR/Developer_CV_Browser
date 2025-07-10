@@ -27,7 +27,10 @@ const HomeView = () => {
     if (usersStatus === "IDLE") {
       dispatch(fetchUsers());
     }
-  }, [userStatus, usersStatus]);
+  }, [userStatus, usersStatus, dispatch]);
+
+  // Get tabs for the user
+  const userTabs = useTabs(loggedUser as User);
 
   // Check if the current path matches any of the user tabs and set the active tab accordingly
   useEffect(() => {
@@ -35,14 +38,11 @@ const HomeView = () => {
     if (userTabs.some((tab) => tab.value === currentPath)) {
       setActiveTab(currentPath);
     }
-  });
-
-  // Get tabs for the user
-  const userTabs = useTabs(loggedUser as User);
+  }, [userTabs]);
 
   // Wait for the user to be logged in before rendering the view
   if (loggedUser === null) {
-    return <Spinner size={40} />;
+    return <Spinner size={40} text="Loading Data..." />;
   }
 
   const changeTab = (tab: string) => {

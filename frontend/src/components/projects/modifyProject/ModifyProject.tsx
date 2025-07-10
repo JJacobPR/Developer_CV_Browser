@@ -10,6 +10,7 @@ const ModifyProject = () => {
   const { users } = useAppSelector((state) => state.userSlice);
   const { loggedUser } = useAppSelector((state) => state.authSlice);
   const currentUser = users.find((user) => user.id === loggedUser?.id);
+  // Add more convenient project select or endpoint in the future
   const project = currentUser?.projects.find((project) => project.projectId === Number(projectId));
 
   const formatDateToLocalYYYYMMDD = (dateString?: string) => {
