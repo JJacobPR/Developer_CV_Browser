@@ -61,7 +61,7 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(    Arrays.asList(
-                "https://main.d1ze0wtyy6zuwv.amplifyapp.com/",
+                "https://main.d1ze0wtyy6zuwv.amplifyapp.com",
                 "http://localhost:5173",
                 "http://localhost:80"
         ));
