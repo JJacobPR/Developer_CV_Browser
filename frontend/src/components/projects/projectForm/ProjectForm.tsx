@@ -110,7 +110,7 @@ const ProjectForm = ({ modalTitle, modalConfirmText, onSubmit, initialData, moda
                 validate: (value) => {
                   const start = new Date(value);
                   const end = new Date(getValues("endDate"));
-                  console.log("Start Date:", start, "End Date:", end);
+
                   if (isNaN(start.getTime()) || isNaN(end.getTime())) return true;
                   return end >= start || "End date must be after start date";
                 },

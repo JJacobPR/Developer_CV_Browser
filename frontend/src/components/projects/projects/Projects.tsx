@@ -11,8 +11,7 @@ const Projects = () => {
   const id = useAppSelector((state) => state.authSlice.loggedUser?.id);
 
   // If there's a userId param, find that user in developers
-  const resolvedUser = users.find((user) => user.id === Number(userId) || user.id === id) as StandardUserWithProjects | null;
-
+  const resolvedUser = users.find((user) => (userId ? user.id === Number(userId) : user.id === id)) as StandardUserWithProjects | null;
   if (!resolvedUser) return null;
 
   return (

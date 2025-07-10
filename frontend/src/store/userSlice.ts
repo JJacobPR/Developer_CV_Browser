@@ -79,7 +79,6 @@ type ModifyUserPayload = {
 
 export const modifyUser = createAsyncThunk<string, ModifyUserPayload, { rejectValue: string }>("users/modifyUser", async ({ id, userRequest }, thunkAPI) => {
   try {
-    console.log(userRequest);
     const response = await fetch(`${API_URL}/user/${id}`, {
       method: "PUT",
       headers: {
