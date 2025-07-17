@@ -10,6 +10,7 @@ import ModifyProject from "@components/projects/modifyProject/ModifyProject";
 import AddUser from "@components/user/addUser/AddUser";
 import ModifyUser from "@components/user/modifyUser/ModifyUser";
 import ErrorView from "@views/errorView/errorView";
+import { technologiesLoader } from "@components/projects/projectForm/ProjectForm";
 
 const router = createBrowserRouter([
   {
@@ -36,10 +37,12 @@ const router = createBrowserRouter([
           {
             path: "my-projects/add-project",
             element: <Authorized child={<AddProject />} role={"USER"} />,
+            loader: technologiesLoader,
           },
           {
             path: "my-projects/modify-project/:projectId",
             element: <Authorized child={<ModifyProject />} role={"USER"} />,
+            loader: technologiesLoader,
           },
           {
             path: "admin/add-user",

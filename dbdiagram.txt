@@ -1,0 +1,78 @@
+Table users {
+  id integer [primary key, increment]
+  email varchar [not null, unique]
+  password varchar [not null, note: 'Hashed']
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table roles_users {
+  role_id integer [not null]
+  user_id integer [not null]
+  indexes {
+    (role_id, user_id) [pk]
+  }
+}
+
+Table roles {
+  id integer [primary key, increment]
+  role_name enum('ADMIN', 'USER', "GUEST") [not null]
+}
+
+Table user_details {
+  user_id integer [primary key, not null]
+  work_role varchar [not null]
+  name varchar [not null]
+  surname varchar [not null]
+  phone_number varchar [not null]
+  bio text [not null]
+}
+
+
+Table projects {
+  id integer [primary key, increment]
+  name varchar [not null]
+  company_name string [not null]
+  description text [not null]
+  start_date date [not null]
+  end_date date [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table technologies {
+  id integer [primary key, increment]
+  name varchar [not null, unique]
+  type enum('FRONTEND', 'BACKEND', 'DATABASE', "DEVOPS") [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table users_projects {
+  id integer [primary key, increment]
+  user_id integer [not null]
+  project_id integer [not null]
+  role varchar [not null]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table projects_technologies {
+  project_id integer [not null]
+  technology_id integer [not null]
+  indexes {
+    (project_id, technology_id) [pk]
+  }
+}
+
+// References
+Ref: users.id < roles_users.user_id
+Ref: roles.id < roles_users.role_id
+Ref: user_details.user_id - users.id
+Ref: users_projects.user_id > user_details.user_id
+Ref: users_projects.project_id > projects.id
+Ref: projects_technologies.project_id > projects.id
+Ref: projects_technologies.technology_id > technologies.id
+
+
+Ref: "technologies"."id" < "technologies"."type"

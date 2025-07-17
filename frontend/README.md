@@ -4,7 +4,7 @@ This is a developer browser side project application built using **React** and *
 
 ## Notes
 
-- Tests are now only configured with some exemplary added (to be changed in th future)
+- Tests are now only configured with some exemplary added (to be changed in the future)
 - State will need to be extended with new slices if the application grows
 - This is a portfolio project. No plans of deploying it long term.
 

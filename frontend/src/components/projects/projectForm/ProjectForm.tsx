@@ -3,6 +3,7 @@ import styles from "./ProjectForm.module.scss";
 import { useEffect, useState, type FormEvent } from "react";
 import type { ProjectRequest } from "models/project";
 import Modal from "../../../ui/modal/Modal";
+import { API_URL } from "../../../config";
 import TechnologySelect from "./technologySelect/TechnologySelect";
 import { useNavigate } from "react-router";
 import { useAppSelector } from "@hooks/redux";
@@ -140,3 +141,16 @@ const ProjectForm = ({ modalTitle, modalConfirmText, onSubmit, initialData, moda
 };
 
 export default ProjectForm;
+
+export const technologiesLoader = async () => {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_URL}/technology`, {
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+  });
+  if (!response.ok) throw new Error();
+
+  return response;
+};

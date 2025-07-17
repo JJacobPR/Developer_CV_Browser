@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { API_URL } from "../../../../config";
+import { useLoaderData } from "react-router";
 import styles from "./TechnologySelect.module.scss";
 import type { Technology } from "models/technology";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -10,7 +9,7 @@ type Props = {
 };
 
 const TechnologySelect = ({ name }: Props) => {
-  const [technologies, setTechnologies] = useState<Technology[]>([]);
+  const technologies = useLoaderData() as Technology[];
 
   const {
     setValue,
@@ -19,27 +18,6 @@ const TechnologySelect = ({ name }: Props) => {
   } = useFormContext();
 
   const selectedTechs: number[] = useWatch({ control, name }) || [];
-
-  useEffect(() => {
-    const fetchTechnologies = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(`${API_URL}/technology`, {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        });
-        if (!response.ok) throw new Error("Failed to fetch technologies");
-        const data = await response.json();
-        setTechnologies(data);
-      } catch (err) {
-        console.error("Error fetching technologies:", err);
-      }
-    };
-
-    fetchTechnologies();
-  }, []);
-
   const toggleTechnology = (techId: number) => {
     const current = new Set(selectedTechs);
     if (current.has(techId)) {
